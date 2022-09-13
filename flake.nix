@@ -10,8 +10,8 @@
       inherit system;
     };
   in {
-    nixosModules.lxd-image = import ./images/lxd-image.nix {inherit nixpkgs;};
-    nixosModules.test = {...}: {};
+    nixosModules.lxd-image = import ./images/lxd-image.nix;
+    nixosModules.lxd-image-vm = import ./images/lxd-image-vm.nix;
 
     packages.x86_64-linux.hello =
       (import lib/eval-config.nix {

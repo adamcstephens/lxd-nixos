@@ -1,10 +1,12 @@
-{ config
-, lib
-, pkgs
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  modulesPath,
+  ...
 }:
 with lib; {
-  system.build.metadata = pkgs.callPackage ../../lib/make-system-tarball.nix {
+  system.build.metadata = pkgs.callPackage (modulesPath + "/../lib/make-system-tarball.nix") {
     contents =
       [
         {

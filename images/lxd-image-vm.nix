@@ -1,13 +1,13 @@
-{ config
-, lib
-, pkgs
-, modulesPath
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  modulesPath,
+  ...
 }:
 with lib; let
   cfg = config.lxd-image-vm;
-in
-{
+in {
   options = {
     lxd-image-vm = {
       vmDerivationName = mkOption {
@@ -21,12 +21,12 @@ in
   };
 
   imports = [
-    ../profiles/qemu-guest.nix
+    (modulesPath + "/profiles/qemu-guest.nix")
     ./lxd-agent.nix
   ];
 
   config = {
-    system.build.qemuImage = import ../../lib/make-disk-image.nix {
+    system.build.qemuImage = import (modulesPath + "/../lib/make-disk-image.nix") {
       name = cfg.vmDerivationName;
 
       inherit pkgs lib config;
@@ -50,10 +50,10 @@ in
 
     boot.growPartition = true;
     boot.loader.systemd-boot.enable = true;
-    boot.kernelParams = [ "console=tty1" "console=ttyS0" ];
+    boot.kernelParams = ["console=tty1" "console=ttyS0"];
     systemd.services."serial-getty@ttyS0" = {
       enable = true;
-      wantedBy = [ "getty.target" ];
+      wantedBy = ["getty.target"];
       serviceConfig.Restart = "always";
     };
 
