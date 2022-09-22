@@ -1,12 +1,11 @@
-{ config
-, lib
-, pkgs
-, ...
-}:
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
   # this is a port of the distrobuilder lxd-agent generator
   # https://github.com/lxc/distrobuilder/blob/master/generators/lxd-agent.go
-
   preStartScript = ''
     PREFIX="/run/lxd_agent"
 
@@ -46,8 +45,7 @@ let
     # Fix up permissions.
     chown -R root:root "''${PREFIX}"
   '';
-in
-{
+in {
   systemd.services.lxd-agent = {
     unitConfig = {
       Description = "LXD - agent";
@@ -70,15 +68,13 @@ in
     preStart = preStartScript;
 
     enable = true;
-    wantedBy = [ "multi-user.target" ];
-    path = [ pkgs.kmod pkgs.util-linux ];
+    wantedBy = ["multi-user.target"];
+    path = [pkgs.kmod pkgs.util-linux];
   };
 
   systemd.paths.lxd-agent = {
     enable = true;
-    wantedBy = [ "multi-user.target" ];
+    wantedBy = ["multi-user.target"];
     pathConfig.PathExists = "/dev/virtio-ports/org.linuxcontainers.lxd";
   };
-
-  # boot.initrd.kernelModules = ["vsock" "virtio_scsi" "virtio_console" "sd_mod"];
 }
