@@ -4,14 +4,11 @@
   pkgs,
   modulesPath,
   ...
-}:
-with lib; let
-  cfg = config.lxd-image-vm;
-in {
+}: {
   options = {
     lxd-image-vm = {
-      vmDerivationName = mkOption {
-        type = types.str;
+      vmDerivationName = lib.mkOption {
+        type = lib.types.str;
         default = "nixos-lxd-${config.system.nixos.label}-${pkgs.stdenv.hostPlatform.system}";
         description = ''
           The name of the derivation for the LXD VM image.
@@ -27,7 +24,7 @@ in {
 
   config = {
     system.build.qemuImage = import (modulesPath + "/../lib/make-disk-image.nix") {
-      name = cfg.vmDerivationName;
+      name = config.lxd-image-vm.vmDerivationName;
 
       inherit pkgs lib config;
 
@@ -57,19 +54,12 @@ in {
       serviceConfig.Restart = "always";
     };
 
-    # swapDevices = [
-    #   {
-    #     device = "/var/swap";
-    #     size = 2048;
-    #   }
-    # ];
+    networking.useDHCP = lib.mkDefault true;
 
-    networking.useDHCP = mkDefault true;
+    documentation.nixos.enable = lib.mkDefault false;
+    documentation.enable = lib.mkDefault false;
+    programs.command-not-found.enable = lib.mkDefault false;
 
-    documentation.nixos.enable = mkDefault false;
-    documentation.enable = mkDefault false;
-    programs.command-not-found.enable = mkDefault false;
-
-    services.openssh.enable = mkDefault true;
+    services.openssh.enable = lib.mkDefault true;
   };
 }
