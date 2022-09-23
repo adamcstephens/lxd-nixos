@@ -5,9 +5,9 @@
     self,
     nixpkgs,
   }: {
-    nixosModules.lxd-agent = import ./modules/lxd-agent.nix;
-    nixosModules.lxd-container = import ./modules/lxd-container.nix;
-    nixosModules.lxd-image-metadata = import ./modules/lxd-image-image-metadata.nix;
-    nixosModules.lxd-vm = import ./modules/lxd-vm.nix;
+    nixosModules.agent = import ./modules/agent.nix;
+    nixosModules.container = import ./modules/container.nix;
+    nixosModules.image-metadata = import ./modules/image-image-metadata.nix;
+    nixosModules.vm = import ./modules/vm.nix;
   };
 }

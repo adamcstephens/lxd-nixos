@@ -6,10 +6,12 @@
   ...
 }: {
   imports = [
-    ./lxd-agent.nix
-    pkgs.modules.installer.cd-dvd.channel
-    pkgs.modules.profiles.minimal
-    pkgs.modules.profiles.clone-config
+    ./agent.nix
+    (modulesPath + "/installer/cd-dvd/channel.nix")
+    (modulesPath + "/profiles/minimal.nix")
+    # pkgs.modules.installer.cd-dvd.channel
+    # pkgs.modules.profiles.minimal
+    # pkgs.modules.profiles.clone-config
   ];
 
   config = {
@@ -19,19 +21,19 @@
     system.build.tarball = pkgs.callPackage ../../lib/make-system-tarball.nix {
       extraArgs = "--owner=0";
 
-      storeContents = [
-        {
-          object = config.system.build.toplevel;
-          symlink = "none";
-        }
-      ];
+      # storeContents = [
+      #   {
+      #     object = config.system.build.toplevel;
+      #     symlink = "none";
+      #   }
+      # ];
 
-      contents = [
-        {
-          source = config.system.build.toplevel + "/init";
-          target = "/sbin/init";
-        }
-      ];
+      # contents = [
+      #   {
+      #     source = config.system.build.toplevel + "/init";
+      #     target = "/sbin/init";
+      #   }
+      # ];
 
       extraCommands = "mkdir -p proc sys dev";
     };

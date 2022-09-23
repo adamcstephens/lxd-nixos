@@ -19,7 +19,7 @@
 
   imports = [
     (modulesPath + "/profiles/qemu-guest.nix")
-    ./lxd-agent.nix
+    ./agent.nix
   ];
 
   config = {
