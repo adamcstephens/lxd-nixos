@@ -29,8 +29,8 @@
       inherit pkgs lib config;
 
       partitionTableType = "efi";
-      format = "qcow2";
-      copyChannel = false;
+      format = "qcow2-compressed";
+      copyChannel = true;
     };
 
     fileSystems = {

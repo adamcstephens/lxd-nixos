@@ -97,6 +97,7 @@ in {
 
   config = {
     system.build.metadata = pkgs.callPackage (modulesPath + "/../lib/make-system-tarball.nix") {
+      fileName = "nixos-lxd-metadata-${pkgs.stdenv.hostPlatform.system}";
       contents =
         [
           {

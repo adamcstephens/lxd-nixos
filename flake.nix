@@ -1,13 +1,89 @@
 {
   description = "Let's focus on LXD and Nix together.";
-
+  inputs = {
+  };
   outputs = {
     self,
     nixpkgs,
-  }: {
+  }: let
+    pkgs = import nixpkgs {system = "x86_64-linux";};
+  in {
+    devShells.x86_64-linux.default = pkgs.mkShell {
+      buildInputs = [
+        pkgs.cachix
+        pkgs.lxd
+      ];
+    };
     nixosModules.agent = import ./modules/agent.nix;
     nixosModules.container = import ./modules/container.nix;
-    nixosModules.image-metadata = import ./modules/image-image-metadata.nix;
+    nixosModules.image-metadata = import ./modules/image-metadata.nix;
     nixosModules.vm = import ./modules/vm.nix;
+
+    nixosConfigurations.image-vm = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        self.nixosModules.vm
+        self.nixosModules.image-metadata
+        {
+          system.stateVersion = "22.05";
+        }
+      ];
+    };
+
+    nixosConfigurations.image-container = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        self.nixosModules.container
+        self.nixosModules.image-metadata
+        {
+          system.stateVersion = "22.05";
+        }
+      ];
+    };
+
+    nixosConfigurations.image-container-aarch64-linux = nixpkgs.lib.nixosSystem {
+      system = "aarch64-linux";
+      modules = [
+        self.nixosModules.container
+        self.nixosModules.image-metadata
+        {
+          system.stateVersion = "22.05";
+        }
+      ];
+    };
+
+    packages.x86_64-linux.image-vm = pkgs.symlinkJoin {
+      name = "image-vm";
+      paths = [
+        self.nixosConfigurations.image-vm.config.system.build.qemuImage
+        self.nixosConfigurations.image-vm.config.system.build.metadata
+      ];
+    };
+    packages.x86_64-linux.import-image-vm = pkgs.writeScriptBin "import-image-vm" ''
+      lxc image import --alias nixos/22.05 \
+        ${self.packages.x86_64-linux.image-vm}/tarball/nixos-lxd-metadata-x86_64-linux.tar.xz \
+        ${self.packages.x86_64-linux.image-vm}/nixos.qcow2
+    '';
+
+    packages.x86_64-linux.image-container = pkgs.symlinkJoin {
+      name = "image-container";
+      paths = [
+        self.nixosConfigurations.image-container.config.system.build.tarball
+        self.nixosConfigurations.image-container.config.system.build.metadata
+      ];
+    };
+    packages.x86_64-linux.import-image-container = pkgs.writeScriptBin "import-image-container" ''
+      lxc image import --alias nixos/22.05 \
+        ${self.packages.x86_64-linux.image-container}/tarball/nixos-lxd-metadata-x86_64-linux.tar.xz \
+        ${self.packages.x86_64-linux.image-container}/tarball/nixos-lxd-image-x86_64-linux.tar.xz
+    '';
+
+    packages.x86_64-linux.image-container-aarch64-linux = pkgs.symlinkJoin {
+      name = "image-container";
+      paths = [
+        self.nixosConfigurations.image-container-aarch64-linux.config.system.build.tarball
+        self.nixosConfigurations.image-container-aarch64-linux.config.system.build.metadata
+      ];
+    };
   };
 }

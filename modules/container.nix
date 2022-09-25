@@ -18,22 +18,23 @@
     boot.isContainer = true;
 
     # TODO: build rootfs as squashfs for faster unpack
-    system.build.tarball = pkgs.callPackage ../../lib/make-system-tarball.nix {
+    system.build.tarball = pkgs.callPackage (modulesPath + "/../lib/make-system-tarball.nix") {
+      fileName = "nixos-lxd-image-${pkgs.stdenv.hostPlatform.system}";
       extraArgs = "--owner=0";
 
-      # storeContents = [
-      #   {
-      #     object = config.system.build.toplevel;
-      #     symlink = "none";
-      #   }
-      # ];
+      storeContents = [
+        {
+          object = config.system.build.toplevel;
+          symlink = "none";
+        }
+      ];
 
-      # contents = [
-      #   {
-      #     source = config.system.build.toplevel + "/init";
-      #     target = "/sbin/init";
-      #   }
-      # ];
+      contents = [
+        {
+          source = config.system.build.toplevel + "/init";
+          target = "/sbin/init";
+        }
+      ];
 
       extraCommands = "mkdir -p proc sys dev";
     };
