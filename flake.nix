@@ -1,6 +1,7 @@
 {
   description = "Let's focus on LXD and Nix together.";
   inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-22.05";
   };
   outputs = {
     self,
