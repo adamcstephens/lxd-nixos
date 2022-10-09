@@ -1,93 +1,102 @@
 {
   description = "Let's focus on LXD and Nix together.";
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-22.05";
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    flake-parts.inputs.nixpkgs.follows = "nixpkgs-2205";
+    nixpkgs-2205.url = "github:nixos/nixpkgs/nixos-22.05";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
   };
   outputs = {
     self,
-    nixpkgs,
-  }: let
-    pkgs = import nixpkgs {system = "x86_64-linux";};
-  in {
-    devShells.x86_64-linux.default = pkgs.mkShellNoCC {
-      buildInputs = [
-        pkgs.cachix
-        pkgs.just
-        pkgs.lxd
-      ];
-    };
-    nixosModules.agent = import ./modules/agent.nix;
-    nixosModules.container = import ./modules/container.nix;
-    nixosModules.image-metadata = import ./modules/image-metadata.nix;
-    nixosModules.vm = import ./modules/vm.nix;
+    flake-parts,
+    ...
+  } @ inputs:
+    flake-parts.lib.mkFlake {inherit self;} {
+      systems = ["x86_64-linux"];
 
-    nixosConfigurations.image-vm = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        self.nixosModules.vm
-        self.nixosModules.image-metadata
-        {
-          system.stateVersion = "22.05";
-        }
-      ];
-    };
+      perSystem = {
+        pkgs,
+        system,
+        ...
+      }: {
+        _module.args.pkgs = inputs.nixpkgs-unstable.legacyPackages.${system};
 
-    nixosConfigurations.image-container = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        self.nixosModules.container
-        self.nixosModules.image-metadata
-        {
-          system.stateVersion = "22.05";
-        }
-      ];
-    };
+        devShells.default = pkgs.mkShellNoCC {
+          buildInputs = [
+            pkgs.cachix
+            pkgs.just
+            pkgs.lxd
+          ];
+        };
 
-    nixosConfigurations.image-container-aarch64-linux = nixpkgs.lib.nixosSystem {
-      system = "aarch64-linux";
-      modules = [
-        self.nixosModules.container
-        self.nixosModules.image-metadata
-        {
-          system.stateVersion = "22.05";
-        }
-      ];
-    };
+        packages = rec {
+          image-vm = pkgs.symlinkJoin {
+            name = "image-vm";
+            paths = [
+              self.nixosConfigurations.image-vm.config.system.build.qemuImage
+              self.nixosConfigurations.image-vm.config.system.build.metadata
+            ];
+          };
+          import-image-vm = pkgs.writeScriptBin "import-image-vm" ''
+            IMAGE="${image-vm}"
 
-    packages.x86_64-linux = rec {
-      image-vm = pkgs.symlinkJoin {
-        name = "image-vm";
-        paths = [
-          self.nixosConfigurations.image-vm.config.system.build.qemuImage
-          self.nixosConfigurations.image-vm.config.system.build.metadata
+            echo "Importing VM image $IMAGE"
+            lxc image import --alias nixos/22.05 \
+              $IMAGE/tarball/nixos-lxd-metadata-x86_64-linux.tar.xz \
+              $IMAGE/nixos.qcow2
+          '';
+
+          image-container = pkgs.symlinkJoin {
+            name = "image-container";
+            paths = [
+              self.nixosConfigurations.image-container.config.system.build.tarball
+              self.nixosConfigurations.image-container.config.system.build.metadata
+            ];
+          };
+          import-image-container = pkgs.writeScriptBin "import-image-container" ''
+            IMAGE="${image-container}"
+
+            echo "Importing container image $IMAGE"
+            lxc image import --alias nixos/22.05 \
+              $IMAGE/tarball/nixos-lxd-metadata-x86_64-linux.tar.xz \
+              $IMAGE/tarball/nixos-lxd-image-x86_64-linux.tar.xz
+          '';
+
+          image-container-aarch64-linux = pkgs.symlinkJoin {
+            name = "image-container";
+            paths = [
+              self.nixosConfigurations.image-container-aarch64-linux.config.system.build.tarball
+              self.nixosConfigurations.image-container-aarch64-linux.config.system.build.metadata
+            ];
+          };
+        };
+      };
+    }
+    // {
+      nixosModules.agent = import ./modules/agent.nix;
+      nixosModules.container = import ./modules/container.nix;
+      nixosModules.image-metadata = import ./modules/image-metadata.nix;
+      nixosModules.vm = import ./modules/vm.nix;
+
+      flake.nixosConfigurations.image-vm = inputs.nixpkgs-unstable.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          self.nixosModules.vm
+          self.nixosModules.image-metadata
+          {
+            system.stateVersion = "22.05";
+          }
         ];
       };
-      import-image-vm = pkgs.writeScriptBin "import-image-vm" ''
-        lxc image import --alias nixos/22.05 \
-          ${image-vm}/tarball/nixos-lxd-metadata-x86_64-linux.tar.xz \
-          ${image-vm}/nixos.qcow2
-      '';
-
-      image-container = pkgs.symlinkJoin {
-        name = "image-container";
-        paths = [
-          self.nixosConfigurations.image-container.config.system.build.tarball
-          self.nixosConfigurations.image-container.config.system.build.metadata
-        ];
-      };
-      import-image-container = pkgs.writeScriptBin "import-image-container" ''
-        lxc image import --alias nixos/22.05 \
-          ${image-container}/tarball/nixos-lxd-metadata-x86_64-linux.tar.xz \
-          ${image-container}/tarball/nixos-lxd-image-x86_64-linux.tar.xz
-      '';
-
-      image-container-aarch64-linux = pkgs.symlinkJoin {
-        name = "image-container";
-        paths = [
-          self.nixosConfigurations.image-container-aarch64-linux.config.system.build.tarball
-          self.nixosConfigurations.image-container-aarch64-linux.config.system.build.metadata
+      flake.nixosConfigurations.image-container = inputs.nixpkgs-unstable.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          self.nixosModules.container
+          self.nixosModules.image-metadata
+          {
+            system.stateVersion = "22.05";
+          }
         ];
       };
     };
-  };
 }
