@@ -4,15 +4,16 @@
 # >>> start_all()
 # >>> server.shell_interact()
 {
-  importer,
+  image,
+  importerBin,
   makeTest,
   pkgs,
-  testName ? "nixos-test",
-  release ? "unstable",
+  testName,
   vm ? false,
 }: let
+  runName = "test-lxd-image";
   launchCommand =
-    "lxc launch nixos/${release} test-lxd-image --profile default --ephemeral"
+    "lxc launch ${image} ${runName} --profile default --ephemeral"
     + (
       if vm
       then " --vm --config security.secureboot=false"
@@ -30,16 +31,19 @@ in
       virtualisation.lxd = {
         enable = true;
       };
+
+      # boot.kernelModules
     };
 
     testScript = ''
       start_all()
       server.wait_for_unit("lxd.service")
       server.succeed("lxd init --minimal")
-      server.succeed("${importer}/bin/import-image")
+      server.succeed("${importerBin}")
       server.succeed("${launchCommand}")
-      server.succeed("sleep 5")
-      server.wait_until_succeeds("lxc exec test-lxd-image true")
+      server.succeed("sleep 10")
+      server.console_interact()
+      # server.wait_until_succeeds("lxc exec ${runName} -- ping -c 1 1.1.1.1")
     '';
   } {
     inherit pkgs;

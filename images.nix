@@ -2,51 +2,9 @@
   withSystem,
   inputs,
   self,
+  lib,
   ...
 }: let
-  mkImageRelease = {
-    pkgs,
-    system,
-    releaseName,
-  }:
-    pkgs.symlinkJoin {
-      name = releaseName;
-      paths = [
-        self.nixosConfigurations.${releaseName}.config.system.build.tarball
-        self.nixosConfigurations.${releaseName}.config.system.build.metadata
-      ];
-    };
-
-  mkImageImporter = {
-    pkgs,
-    system,
-    releaseName,
-    imageRelease,
-  }: let
-    pkg = self.packages.${system}.${releaseName};
-  in
-    pkgs.writeScriptBin "import-image" ''
-      echo "Importing container image ${pkg}"
-      lxc image import --alias nixos/${imageRelease} \
-        ${pkg}/tarball/nixos-lxd-metadata-${system}.tar.xz \
-        ${pkg}/tarball/nixos-lxd-image-${system}.tar.xz
-    '';
-
-  mkImageTest = {
-    pkgs,
-    importerName,
-    releaseName,
-    system,
-  }:
-    import ./nixos-test.nix {
-      inherit pkgs;
-      makeTest = import (pkgs.path + "/nixos/tests/make-test-python.nix");
-
-      testName = "${releaseName}-test";
-      importer = self.packages.${system}.${importerName};
-      release = releaseName;
-    };
-
   mkImage = {
     type,
     nixosRelease,
@@ -60,14 +18,19 @@
     importerName = "importer_${releaseName}";
     inputNixpkgsRelease = "nixpkgs-" + normalizeRelease;
     pkgs = inputs.${inputNixpkgsRelease}.legacyPackages.${system};
+    vm = if type == "vm" then true else false;
+
+    imagePath = if vm then "qemuImage" else "tarball";
+    imagePkg = self.packages.${system}.${releaseName};
+    imagePathFile = if vm then imagePkg + "/nixos.qcow2" else imagePkg + "/tarball/nixos-lxd-metadata-${system}.tar.xz";
   in rec {
     flake.checks.${system}.${releaseName} = import ./nixos-test.nix {
-      inherit pkgs;
+      inherit pkgs vm;
       makeTest = import (pkgs.path + "/nixos/tests/make-test-python.nix");
 
-      testName = "${releaseName}-test";
-      importer = self.packages.${system}.${importerName};
-      release = releaseName;
+      testName = "${releaseName}_test";
+      importerBin = self.packages.${system}.${importerName} + "/bin/import_" + releaseName;
+      image = imageRelease;
     };
 
     flake.nixosConfigurations.${releaseName} = withSystem system ({...}:
@@ -86,29 +49,45 @@
       ${releaseName} = pkgs.symlinkJoin {
         name = releaseName;
         paths = [
-          self.nixosConfigurations.${releaseName}.config.system.build.tarball
+          self.nixosConfigurations.${releaseName}.config.system.build.${imagePath}
           self.nixosConfigurations.${releaseName}.config.system.build.metadata
         ];
       };
-      ${importerName} = let
-        pkg = self.packages.${system}.${releaseName};
-      in
-        pkgs.writeScriptBin "import-image" ''
-          echo "Importing container image ${pkg}"
-          lxc image import --alias nixos/${imageRelease} \
-            ${pkg}/tarball/nixos-lxd-metadata-${system}.tar.xz \
-            ${pkg}/tarball/nixos-lxd-image-${system}.tar.xz
+
+      ${importerName} = pkgs.writeScriptBin "import_${releaseName}" ''
+          echo "Importing container image ${imagePkg}"
+          lxc image import --alias ${imageRelease} \
+            ${imagePathFile} \
+            ${imagePkg}/tarball/nixos-lxd-metadata-${system}.tar.xz
         '';
     };
   };
 in
-  # inputs.nixpkgs-2205.lib.recursiveUpdate mkImage {
-  #   system = "aarch64-linux";
-  #   type = "container";
-  #   nixosRelease = "22.05";
-  # }
-  mkImage {
-    system = "x86_64-linux";
-    type = "container";
-    nixosRelease = "22.05";
-  }
+  builtins.foldl' (l: r:
+    lib.attrsets.recursiveUpdate l r) {} [
+    (mkImage {
+      system = "aarch64-linux";
+      type = "container";
+      nixosRelease = "22.05";
+    })
+    (mkImage {
+      system = "x86_64-linux";
+      type = "container";
+      nixosRelease = "22.05";
+    })
+    (mkImage {
+      system = "x86_64-linux";
+      type = "container";
+      nixosRelease = "unstable";
+    })
+    (mkImage {
+      system = "x86_64-linux";
+      type = "vm";
+      nixosRelease = "22.05";
+    })
+    (mkImage {
+      system = "x86_64-linux";
+      type = "vm";
+      nixosRelease = "unstable";
+    })
+  ]
