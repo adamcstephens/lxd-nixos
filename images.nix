@@ -12,24 +12,33 @@
     system,
   }: let
     normalizeRelease = builtins.replaceStrings ["."] [""] nixosRelease;
-    releaseSystem = builtins.replaceStrings ["-linux"] [""] system;
-    releaseName = "image_${type}_${normalizeRelease}";
+    releaseName = "image-${type}-${normalizeRelease}";
+
     imageRelease = "nixos/${nixosRelease}";
-    importerName = "importer_${releaseName}";
+    importerName = "import-${releaseName}";
     inputNixpkgsRelease = "nixpkgs-" + normalizeRelease;
     pkgs = inputs.${inputNixpkgsRelease}.legacyPackages.${system};
-    vm = if type == "vm" then true else false;
+    vm =
+      if type == "vm"
+      then true
+      else false;
 
-    imagePath = if vm then "qemuImage" else "tarball";
+    imagePath =
+      if vm
+      then "qemuImage"
+      else "tarball";
     imagePkg = self.packages.${system}.${releaseName};
-    imagePathFile = if vm then imagePkg + "/nixos.qcow2" else imagePkg + "/tarball/nixos-lxd-metadata-${system}.tar.xz";
-  in rec {
+    imagePathFile =
+      if vm
+      then imagePkg + "/nixos.qcow2"
+      else imagePkg + "/tarball/nixos-lxd-image-${system}.tar.xz";
+  in {
     flake.checks.${system}.${releaseName} = import ./nixos-test.nix {
       inherit pkgs vm;
       makeTest = import (pkgs.path + "/nixos/tests/make-test-python.nix");
 
       testName = "${releaseName}_test";
-      importerBin = self.packages.${system}.${importerName} + "/bin/import_" + releaseName;
+      importerBin = self.packages.${system}.${importerName} + "/bin/import-" + releaseName;
       image = imageRelease;
     };
 
@@ -54,12 +63,12 @@
         ];
       };
 
-      ${importerName} = pkgs.writeScriptBin "import_${releaseName}" ''
-          echo "Importing container image ${imagePkg}"
-          lxc image import --alias ${imageRelease} \
-            ${imagePathFile} \
-            ${imagePkg}/tarball/nixos-lxd-metadata-${system}.tar.xz
-        '';
+      ${importerName} = pkgs.writeScriptBin "import-${releaseName}" ''
+        echo "Importing container image ${imagePkg}"
+        lxc image import --alias ${imageRelease} \
+          ${imagePkg}/tarball/nixos-lxd-metadata-${system}.tar.xz \
+          ${imagePathFile}
+      '';
     };
   };
 in

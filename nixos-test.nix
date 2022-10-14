@@ -13,11 +13,11 @@
 }: let
   runName = "test-lxd-image";
   launchCommand =
-    "lxc launch ${image} ${runName} --profile default --ephemeral"
+    "lxc launch ${image} ${runName} --profile default --ephemeral "
     + (
       if vm
-      then " --vm --config security.secureboot=false"
-      else ""
+      then "--vm --config security.secureboot=false"
+      else "--config security.nesting=true"
     );
 in
   makeTest {
@@ -25,7 +25,7 @@ in
 
     nodes.server = {...}: {
       virtualisation.cores = 2;
-      virtualisation.memorySize = 2046;
+      virtualisation.memorySize = 2048;
       virtualisation.diskSize = 4096;
 
       virtualisation.lxd = {
@@ -42,8 +42,7 @@ in
       server.succeed("${importerBin}")
       server.succeed("${launchCommand}")
       server.succeed("sleep 10")
-      server.console_interact()
-      # server.wait_until_succeeds("lxc exec ${runName} -- ping -c 1 1.1.1.1")
+      server.succeed("lxc exec ${runName} --force-interactive true")
     '';
   } {
     inherit pkgs;
