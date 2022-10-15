@@ -7,11 +7,8 @@
 }: {
   imports = [
     ./agent.nix
+    ./common.nix
     (modulesPath + "/installer/cd-dvd/channel.nix")
-    (modulesPath + "/profiles/minimal.nix")
-    # pkgs.modules.installer.cd-dvd.channel
-    # pkgs.modules.profiles.minimal
-    # pkgs.modules.profiles.clone-config
   ];
 
   config = {
