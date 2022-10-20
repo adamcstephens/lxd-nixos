@@ -3,6 +3,7 @@
   inputs = {
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs.follows = "nixpkgs-2205";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-22.05";
     nixpkgs-2205.url = "github:nixos/nixpkgs/nixos-22.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
   };
@@ -16,6 +17,7 @@
 
       imports = [
         ./images.nix
+        ./importer.nix
       ];
 
       perSystem = {
@@ -33,6 +35,7 @@
             pkgs.lxd
           ];
         };
+        packages = self.imageImporters self;
       };
     }
     // {

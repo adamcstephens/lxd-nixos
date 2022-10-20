@@ -47,7 +47,6 @@
         system = system;
         modules = [
           self.nixosModules.${type}
-          self.nixosModules.imageMetadata
           {
             system.stateVersion = nixosRelease;
           }

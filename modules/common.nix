@@ -1,4 +1,7 @@
 {lib, ...}: {
+  imports = [
+    ./image-metadata.nix
+  ];
   networking.useDHCP = lib.mkDefault true;
 
   documentation.nixos.enable = lib.mkDefault false;
