@@ -59,7 +59,6 @@
       "sys-kernel-debug.mount"
     ];
 
-    systemd.services."container-getty@1".wantedBy = ["getty.target"];
     boot.postBootCommands = ''
       # After booting, register the contents of the Nix store in the Nix
       # database.
