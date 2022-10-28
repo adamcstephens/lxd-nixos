@@ -4,7 +4,19 @@
   pkgs,
   modulesPath,
   ...
-}: {
+}: let
+  # Add the overrides from lxd distrobuilder
+  # https://github.com/lxc/distrobuilder/blob/f15eec09df7b04f1bede66b0f31354da66748c9a/distrobuilder/main.go#L622
+  systemdOverride = pkgs.writeText "lxd-systemd-override" ''
+    [Service]
+    ProcSubset=all
+    ProtectProc=default
+    ProtectControlGroups=no
+    ProtectKernelTunables=no
+    NoNewPrivileges=no
+    LoadCredential=
+  '';
+in {
   imports = [
     ./agent.nix
     ./common.nix
@@ -36,17 +48,15 @@
       extraCommands = "mkdir -p proc sys dev";
     };
 
-    # Add the overrides from lxd distrobuilder
-    # https://github.com/lxc/distrobuilder/blob/f15eec09df7b04f1bede66b0f31354da66748c9a/distrobuilder/main.go#L622
-    systemd.extraConfig = ''
-      [Service]
-      ProcSubset=all
-      ProtectProc=default
-      ProtectControlGroups=no
-      ProtectKernelTunables=no
-      NoNewPrivileges=no
-      LoadCredential=
-    '';
+    systemd.packages = [
+      (pkgs.runCommandNoCC "toplevel-overrides.conf" {
+          preferLocalBuild = true;
+          allowSubstitutes = false;
+        } ''
+          mkdir -p $out/etc/systemd/system/service.d/
+          cp ${systemdOverride} $out/etc/systemd/system/service.d/lxc.conf
+        '')
+    ];
 
     system.activationScripts.installInitScript = lib.mkForce ''
       ln -fs $systemConfig/init /sbin/init
