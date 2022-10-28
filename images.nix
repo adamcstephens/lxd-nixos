@@ -61,13 +61,6 @@
           self.nixosConfigurations.${releaseName}.config.system.build.metadata
         ];
       };
-
-      ${importerName} = pkgs.writeScriptBin "import-${releaseName}" ''
-        echo "Importing container image ${imagePkg}"
-        lxc image import --alias ${imageRelease} \
-          ${imagePkg}/tarball/nixos-lxd-metadata-${system}.tar.xz \
-          ${imagePathFile}
-      '';
     };
   };
 in

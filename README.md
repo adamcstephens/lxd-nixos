@@ -15,9 +15,9 @@ Use these commands to build images for both containers and VMs and then import t
 _Note_ Only one will hold the image alias. Still troubleshooting this.
 
 ```
-nix run github:adamcstephens/lxd-nix#import-image-container-unstable
+nix run github:adamcstephens/lxd-nix#lxd-import-image-container-2205
 # now available for running
-lxc launch nixos/unstable test1
+lxc launch nixos/image-container-2205 test1
 ```
 
 ## NixOS Modules
