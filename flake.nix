@@ -2,7 +2,6 @@
   description = "Let's focus on LXD and Nix together.";
   inputs = {
     flake-parts.url = "github:hercules-ci/flake-parts";
-    flake-parts.inputs.nixpkgs.follows = "nixpkgs-2205";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-22.05";
     nixpkgs-2205.url = "github:nixos/nixpkgs/nixos-22.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -11,7 +10,7 @@
     self,
     flake-parts,
     ...
-  } @ inputs:
+  }:
     flake-parts.lib.mkFlake {inherit self;} {
       systems = ["x86_64-linux"];
 
@@ -26,8 +25,6 @@
         self',
         ...
       }: {
-        _module.args.pkgs = inputs.nixpkgs-2205.legacyPackages.${system};
-
         devShells.default = pkgs.mkShellNoCC {
           buildInputs = [
             pkgs.cachix
