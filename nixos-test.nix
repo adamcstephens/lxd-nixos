@@ -9,15 +9,15 @@
   makeTest,
   pkgs,
   testName,
-  vm ? false,
+  type ? "container",
 }: let
   runName = "test-lxd-image";
   launchCommand =
-    "lxc launch ${image} ${runName} --profile default --ephemeral "
+    "lxc launch ${image} ${runName} --profile default "
     + (
-      if vm
+      if type == "vm"
       then "--vm --config security.secureboot=false"
-      else "--config security.nesting=true"
+      else ""
     );
 in
   makeTest {
@@ -40,8 +40,10 @@ in
       server.wait_for_unit("lxd.service")
       server.succeed("lxd init --minimal")
       server.succeed("${importerBin}")
+      server.succeed("lxc image list -f compact")
       server.succeed("${launchCommand}")
       server.succeed("sleep 10")
+      server.succeed("lxc list -f compact")
       server.succeed("lxc exec ${runName} --force-interactive true")
     '';
   } {
