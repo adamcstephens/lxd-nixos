@@ -6,7 +6,7 @@ import release='unstable':
     # nix run .#import-image-vm-{{release}}
 
 clean:
-    lxc image list -c LF | grep nixos | awk '{print $4}' | egrep '^[0-9a-f]' | xargs lxc image delete
+    lxc image list -c LF -f compact | grep -v nixos | awk '{print $1}' | egrep '^[0-9a-f]' | xargs lxc image delete
 
 push:
     nix build .#image-container-2205 --json | jq -r '.[].outputs | to_entries[].value' | cachix push lxd-nix

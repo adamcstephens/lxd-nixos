@@ -48,11 +48,12 @@
 in
   builtins.foldl' (l: r:
     lib.attrsets.recursiveUpdate l r) {} [
-    # (mkImage {
-    #   system = "aarch64-linux";
-    #   type = "container";
-    #   nixosRelease = "22.05";
-    # })
+    (mkImage {
+      system = "aarch64-linux";
+      type = "container";
+      nixosRelease = "22.05";
+      metadata.imageName = "22.05/container";
+    })
     (mkImage {
       system = "x86_64-linux";
       type = "container";
