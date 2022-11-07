@@ -5,7 +5,7 @@
 }: {
   flake.imageImporters = flake: let
     vmPath = ["config" "system" "build" "qemuImage"];
-    containerPath = ["config" "system" "build" "tarball"];
+    containerPath = ["config" "system" "build" "squashfs"];
 
     isVM = host: lib.hasAttrByPath vmPath host;
     isContainer = host: lib.hasAttrByPath containerPath host;
@@ -23,14 +23,10 @@
       imageSystem = value.config.nixpkgs.localSystem.system;
 
       lxdMeta = value.config.system.build.metadata;
-      imageAttr =
-        if (isVM value)
-        then value.config.system.build.qemuImage
-        else value.config.system.build.tarball;
       imagePathFile =
         if (isVM value)
-        then imageAttr + "/nixos.qcow2"
-        else imageAttr + "/tarball/nixos-lxd-image-${imageSystem}.tar.xz";
+        then value.config.system.build.qemuImage + "/nixos.qcow2"
+        else value.config.system.build.squashfs;
 
       # lib.hasAttrByPath vmPath name;
       script = inputs.nixpkgs.legacyPackages.x86_64-linux.writeScriptBin "import" ''

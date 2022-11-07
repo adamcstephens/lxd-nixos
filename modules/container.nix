@@ -25,26 +25,18 @@ in {
   config = {
     boot.isContainer = true;
 
-    # TODO: build rootfs as squashfs for faster unpack
-    system.build.tarball = pkgs.callPackage (modulesPath + "/../lib/make-system-tarball.nix") {
+    system.build.squashfs = pkgs.callPackage ../lib/make-squashfs.nix {
       fileName = "nixos-lxd-image-${pkgs.stdenv.hostPlatform.system}";
-      extraArgs = "--owner=0";
 
-      storeContents = [
-        {
-          object = config.system.build.toplevel;
-          symlink = "none";
-        }
+      storeContents = [config.system.build.toplevel];
+
+      pseudoFiles = [
+        "/sbin d 0755 0 0"
+        "/sbin/init s 0555 0 0 ${config.system.build.toplevel}/init"
+        "/dev d 0755 0 0"
+        "/proc d 0555 0 0"
+        "/sys d 0555 0 0"
       ];
-
-      contents = [
-        {
-          source = config.system.build.toplevel + "/init";
-          target = "/sbin/init";
-        }
-      ];
-
-      extraCommands = "mkdir -p proc sys dev";
     };
 
     systemd.packages = [
