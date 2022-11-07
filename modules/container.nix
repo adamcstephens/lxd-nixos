@@ -14,7 +14,6 @@
     ProtectControlGroups=no
     ProtectKernelTunables=no
     NoNewPrivileges=no
-    LoadCredential=
   '';
 in {
   imports = [
@@ -80,5 +79,10 @@ in {
       # nixos-rebuild also requires a "system" profile
       ${config.nix.package.out}/bin/nix-env -p /nix/var/nix/profiles/system --set /run/current-system
     '';
+
+    # explicitly set /run to shared so bind mounts work, e.g. LoadCredential=
+    boot.specialFileSystems = {
+      "/run".options = ["shared"];
+    };
   };
 }
