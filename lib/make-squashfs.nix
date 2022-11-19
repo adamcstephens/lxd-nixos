@@ -35,7 +35,7 @@ in
 
       # Generate the squashfs image.
       mksquashfs nix-path-registration $(cat $closureInfo/store-paths) $out ${pseudoFilesArgs}  \
-        -no-hardlinks -no-strip -all-root -b 1048576 -comp ${comp} \
+        -no-hardlinks -no-strip -all-root -root-mode 0755 -b 1048576 -comp ${comp} \
         -processors $NIX_BUILD_CORES
     '';
   }
