@@ -2,8 +2,9 @@
   description = "Let's focus on LXD and Nix together.";
   inputs = {
     flake-parts.url = "github:hercules-ci/flake-parts";
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-22.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
     nixpkgs-2205.url = "github:nixos/nixpkgs/nixos-22.05";
+    nixpkgs-2211.url = "github:nixos/nixpkgs/nixos-22.11";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
   };
   outputs = {
