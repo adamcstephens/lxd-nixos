@@ -33,11 +33,7 @@
             pkgs.lxd
           ];
         };
-        packages =
-          (self.imageImporters self)
-          // {
-            lxd = pkgs.callPackage ./packages/lxd.nix {};
-          };
+        packages = (self.imageImporters self) // {inherit (pkgs.callPackage ./packages/lxd.nix {}) lxd lxd_lts;};
       };
     }
     // {

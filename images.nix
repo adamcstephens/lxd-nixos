@@ -62,20 +62,32 @@ in
     })
     (mkImage {
       system = "x86_64-linux";
+      type = "vm";
+      nixosRelease = "22.05";
+      metadata.imageName = "22.05/vm";
+    })
+    (mkImage {
+      system = "x86_64-linux";
+      type = "container";
+      nixosRelease = "22.11";
+      metadata.imageName = "22.11/container";
+    })
+    (mkImage {
+      system = "x86_64-linux";
+      type = "vm";
+      nixosRelease = "22.11";
+      metadata.imageName = "22.11/vm";
+    })
+    (mkImage {
+      system = "x86_64-linux";
       type = "container";
       nixosRelease = "unstable";
       metadata.imageName = "unstable/container";
     })
-    # (mkImage {
-    #   system = "x86_64-linux";
-    #   type = "vm";
-    #   nixosRelease = "22.05";
-    #   metadata.imageName = "22.05/vm";
-    # })
-    # (mkImage {
-    #   system = "x86_64-linux";
-    #   type = "vm";
-    #   nixosRelease = "unstable";
-    #   metadata.imageName = "unstable/vm";
-    # })
+    (mkImage {
+      system = "x86_64-linux";
+      type = "vm";
+      nixosRelease = "unstable";
+      metadata.imageName = "unstable/vm";
+    })
   ]
