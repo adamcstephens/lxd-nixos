@@ -33,7 +33,20 @@
             pkgs.lxd
           ];
         };
-        packages = (self.imageImporters self) // {inherit (pkgs.callPackage ./packages/lxd.nix {}) lxd lxd_lts;};
+        packages =
+          (self.imageImporters self)
+          // {
+            inherit
+              (pkgs.callPackage ./packages/lxd.nix {
+                OVMFFull = self'.packages.ovmf;
+              })
+              lxd
+              lxd_lts
+              ;
+          }
+          // {
+            ovmf = pkgs.callPackage ./packages/ovmf {};
+          };
       };
     }
     // {
