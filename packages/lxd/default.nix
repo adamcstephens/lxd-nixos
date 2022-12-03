@@ -37,8 +37,9 @@
           --replace "/usr/share/misc/usb.ids" "${hwdata}/share/hwdata/usb.ids"
       '';
 
-      excludedPackages = ["test" "lxd/db/generate"];
+      excludedPackages = ["test" "lxd/db/generate" "lxd-agent" "lxd-migrate"];
 
+      strictDeps = true;
       nativeBuildInputs = [installShellFiles pkg-config];
       buildInputs = [
         lxc
@@ -56,6 +57,11 @@
       preBuild = ''
         # required for go-dqlite. See: https://github.com/lxc/lxd/pull/8939
         export CGO_LDFLAGS_ALLOW="(-Wl,-wrap,pthread_create)|(-Wl,-z,now)"
+      '';
+
+      postBuild = ''
+        CGO_ENABLED=0 go install -v -tags netgo ./lxd-migrate
+        CGO_ENABLED=0 go install -v -tags agent,netgo ./lxd-agent
       '';
 
       preCheck = let
