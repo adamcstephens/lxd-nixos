@@ -9,6 +9,7 @@
   makeTest,
   pkgs,
   testName,
+  lxd ? pkgs.lxd,
   type ? "container",
 }: let
   runName = "test-lxd-image";
@@ -24,15 +25,16 @@ in
     name = testName;
 
     nodes.server = {...}: {
+      boot.kernelModules = ["vhost_vsock"];
+
       virtualisation.cores = 2;
       virtualisation.memorySize = 2048;
       virtualisation.diskSize = 4096;
 
       virtualisation.lxd = {
         enable = true;
+        package = lxd;
       };
-
-      # boot.kernelModules
     };
 
     testScript = ''
