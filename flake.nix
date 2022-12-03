@@ -41,7 +41,7 @@
                 OVMFFull = self'.packages.ovmf;
               })
               lxd
-              lxd_lts
+              lxd-lts
               ;
           }
           // {

@@ -36,50 +36,54 @@
   util-linux,
   gptfdisk,
   nftables,
+  kmod,
+  cdrkit,
   nixosTests,
   useQemu ? true,
 }: let
-    binPath =
-      [
-        acl
-        attr
-        bash
-        btrfs-progs
-        criu
-        dnsmasq
-        gnutar
-        gptfdisk
-        gzip
-        iproute2
-        iptables
-        nftables
-        rsync
-        squashfsTools
-        util-linux
-        xz
+  binPath =
+    [
+      acl
+      attr
+      bash
+      btrfs-progs
+      cdrkit
+      criu
+      dnsmasq
+      gnutar
+      gptfdisk
+      gzip
+      iproute2
+      iptables
+      kmod
+      nftables
+      rsync
+      squashfsTools
+      util-linux
+      xz
 
-        (writeShellScriptBin "apparmor_parser" ''
-          exec '${apparmor-parser}/bin/apparmor_parser' -I '${apparmor-profiles}/etc/apparmor.d' "$@"
-        '')
-      ]
-      ++ (lib.optionals useQemu [qemu-utils qemu_kvm]);
+      (writeShellScriptBin "apparmor_parser" ''
+        exec '${apparmor-parser}/bin/apparmor_parser' -I '${apparmor-profiles}/etc/apparmor.d' "$@"
+      '')
+    ]
+    ++ (lib.optionals useQemu [qemu-utils qemu_kvm]);
 
-    firmware = linkFarm "lxd-firmware" [
-      {
-        name = "share/OVMF/OVMF_CODE.fd";
-        path = "${OVMFFull.fd}/FV/OVMF_CODE.fd";
-      }
-      {
-        name = "share/OVMF/OVMF_VARS.fd";
-        path = "${OVMFFull.fd}/FV/OVMF_VARS.fd";
-      }
-      {
-        name = "share/OVMF/OVMF_VARS.ms.fd";
-        path = "${OVMFFull.fd}/FV/OVMF_VARS.fd";
-      }
-    ];
+  firmware = linkFarm "lxd-firmware" [
+    {
+      name = "share/OVMF/OVMF_CODE.fd";
+      path = "${OVMFFull.fd}/FV/OVMF_CODE.fd";
+    }
+    {
+      name = "share/OVMF/OVMF_VARS.fd";
+      path = "${OVMFFull.fd}/FV/OVMF_VARS.fd";
+    }
+    {
+      name = "share/OVMF/OVMF_VARS.ms.fd";
+      path = "${OVMFFull.fd}/FV/OVMF_VARS.fd";
+    }
+  ];
 
-    LXD_OVMF_PATH = "${firmware}/share/OVMF";
+  LXD_OVMF_PATH = "${firmware}/share/OVMF";
 
   generic = {
     hash,
@@ -179,5 +183,5 @@ in rec {
   };
 
   lxd = lxd_5_7;
-  lxd_lts = lxd_5_0;
+  lxd-lts = lxd_5_0;
 }
