@@ -1,4 +1,4 @@
-# lxd-nix
+# lxd-nixos
 
 NixOS support for LXD. Flake native.
 
@@ -13,7 +13,7 @@ Features:
 Use these commands to build images for both containers and VMs and then import them into LXD
 
 ```
-nix run github:adamcstephens/lxd-nix#lxd-import-image-container-2205
+nix run github:adamcstephens/lxd-nixos#lxd-import-image-container-2205
 # now available for running
 lxc launch nixos/22.05/container test1
 ```
@@ -23,8 +23,7 @@ lxc launch nixos/22.05/container test1
 Add to your flake
 
 ```
-inputs.lxd-nix.url = "github:adamcstephens/lxd-nix"
-inputs.lxd-nix.inputs.nixpkgs.follows = "nixpkgs"
+inputs.lxd-nixos.url = "github:adamcstephens/lxd-nixos"
 ```
 
 Use one of the following to configure a nixosConfiguration as an LXD guest.
@@ -33,7 +32,7 @@ Use one of the following to configure a nixosConfiguration as an LXD guest.
 
 ```
   imports = [
-    inputs.lxd-nix.nixosModules.container
+    inputs.lxd-nixos.nixosModules.container
   ];
 ```
 
@@ -41,8 +40,24 @@ Use one of the following to configure a nixosConfiguration as an LXD guest.
 
 ```
   imports = [
-    inputs.lxd-nix.nixosModules.vm
+    inputs.lxd-nixos.nixosModules.vm
   ];
+```
+
+## Import your own images
+
+1. Add the nixosModule for the container or vm to a nixosConfiguration
+
+2. Update your flake to include the importers in your packages
+
+```nix
+packages = inputs.lxd-nixos.imageImporters self;
+```
+
+3. Run `nix flake show` to see newly added packages for `lxd-import-<hostname>` and run the importer
+
+``` sh
+nix run .#lxd-import-mynixos
 ```
 
 ## Background
