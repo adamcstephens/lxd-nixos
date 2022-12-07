@@ -30,6 +30,8 @@
 
       importerBin = self.packages.${system}.${importerName} + "/bin/import";
       image = imageRelease;
+
+      lxd = self.packages.${system}.lxd-latest;
     };
 
     flake.nixosConfigurations.${releaseName} = withSystem system ({...}:
