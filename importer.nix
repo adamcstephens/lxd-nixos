@@ -30,10 +30,13 @@
 
       # lib.hasAttrByPath vmPath name;
       script = inputs.nixpkgs.legacyPackages.x86_64-linux.writeScriptBin "import" ''
+        [ -n "$1" ] && REMOTE="$1:"
+
         echo "Importing container image ${appName}"
         lxc image import --alias ${imageName} \
           ${lxdMeta}/tarball/nixos-lxd-metadata-${imageSystem}.tar.xz \
-          ${imagePathFile}
+          ${imagePathFile} \
+          $REMOTE
       '';
     in
       lib.nameValuePair appName script;
