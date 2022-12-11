@@ -38,14 +38,11 @@
           // {
             inherit (pkgs.callPackage ./packages/lxd {}) lxd-unwrapped lxd-unwrapped-latest;
 
-            ovmf = pkgs.callPackage ./packages/ovmf {};
             lxd = pkgs.callPackage ./packages/lxd/wrapper.nix {
               lxd-unwrapped = self'.packages.lxd-unwrapped;
-              OVMFFull = self'.packages.ovmf;
             };
             lxd-latest = pkgs.callPackage ./packages/lxd/wrapper.nix {
               lxd-unwrapped = self'.packages.lxd-unwrapped-latest;
-              OVMFFull = self'.packages.ovmf;
             };
           };
       };
