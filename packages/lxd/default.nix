@@ -98,16 +98,11 @@ in rec {
     hash = "sha256-Y74OwgbaaRQlEnHSd4EkJCAp49PAv0qiOB2SHuATM4I=";
   };
 
-  lxd-unwrapped-5_7 = generic {
-    version = "5.7";
-    hash = "sha256-TZeF/VPrP4qRAVezJwQWtfypsxBJpnTrST0uDdw3WVI=";
+  lxd-unwrapped-5_9 = generic {
+    version = "5.9";
+    hash = "sha256-okz3++PlUno03tp+jpLxfAWlFJhyOCH2mxRtHo5YEX8=";
   };
 
-  lxd-unwrapped-5_8 = generic {
-    version = "5.8";
-    hash = "sha256-mYyDYO8k4MVoNa8xfp1vH2nyuhNsDJ93s9F5hjaMftk=";
-  };
-
-  lxd-unwrapped-latest = lxd-unwrapped-5_7;
+  lxd-unwrapped-latest = lxd-unwrapped-5_9;
   lxd-unwrapped = lxd-unwrapped-5_0;
 }
