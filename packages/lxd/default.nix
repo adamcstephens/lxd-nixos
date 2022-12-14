@@ -32,6 +32,8 @@
 
       vendorSha256 = null;
 
+      outputs = ["out" "client"];
+
       postPatch = ''
         substituteInPlace shared/usbid/load.go \
           --replace "/usr/share/misc/usb.ids" "${hwdata}/share/hwdata/usb.ids"
@@ -77,6 +79,11 @@
         buildFlagsArray+=("-run" "[^(${
           builtins.concatStringsSep "|" skippedTests
         })]")
+      '';
+
+      preInstall = ''
+        mkdir -p $client/bin
+        mv "$GOPATH/bin/lxc" $client/bin
       '';
 
       postInstall = ''
