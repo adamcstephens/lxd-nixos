@@ -30,7 +30,7 @@
           buildInputs = [
             pkgs.cachix
             pkgs.just
-            pkgs.lxd
+            self'.packages.lxd-latest.client
           ];
         };
         packages =
