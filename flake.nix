@@ -41,12 +41,10 @@
             lxd = pkgs.callPackage ./packages/lxd/wrapper.nix {
               lxd-unwrapped = self'.packages.lxd-unwrapped;
             };
-            lxd-client = self'.packages.lxd-unwrapped.client;
 
             lxd-latest = pkgs.callPackage ./packages/lxd/wrapper.nix {
               lxd-unwrapped = self'.packages.lxd-unwrapped-latest;
             };
-            lxd-client-latest = self'.packages.lxd-unwrapped-latest.client;
           };
       };
     }

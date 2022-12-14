@@ -92,5 +92,5 @@ in
       inherit (nixosTests) lxd lxd-nftables lxd-qemu;
     };
 
-    inherit (lxd) meta;
+    inherit (lxd) meta client;
   }
