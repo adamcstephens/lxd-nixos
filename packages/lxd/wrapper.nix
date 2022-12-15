@@ -79,7 +79,7 @@ in
   symlinkJoin {
     name = "lxd-${lxd.version}";
 
-    paths = [lxd];
+    paths = [lxd lxd.client];
 
     nativeBuildInputs = [makeWrapper];
     postBuild = ''
