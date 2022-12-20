@@ -13,9 +13,11 @@ Features:
 Use these commands to build images for both containers and VMs and then import them into LXD
 
 ```
-nix run github:adamcstephens/lxd-nixos#lxd-import-image-container-2205
+nix run git+https://codeberg.org/adamcstephens/lxd-nixos#lxd-import-image-container-2211
+nix run git+https://codeberg.org/adamcstephens/lxd-nixos#lxd-import-image-container-unstable
+
 # now available for running
-lxc launch nixos/22.05/container test1
+lxc launch nixos/22.11/container test1
 ```
 
 ## NixOS Modules
@@ -23,7 +25,7 @@ lxc launch nixos/22.05/container test1
 Add to your flake
 
 ```
-inputs.lxd-nixos.url = "github:adamcstephens/lxd-nixos"
+inputs.lxd-nixos.url = "git+https://codeberg.org/adamcstephens/lxd-nixos"
 ```
 
 Use one of the following to configure a nixosConfiguration as an LXD guest.
