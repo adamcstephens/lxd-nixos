@@ -42,11 +42,25 @@
             lxd = pkgs.callPackage ./packages/lxd/wrapper.nix {
               lxd-unwrapped = self'.packages.lxd-unwrapped;
               OVMFFull = self'.packages.ovmf;
+              btrfs-progs = pkgs.btrfs-progs.overrideAttrs (old: rec {
+                version = "6.0";
+                src = pkgs.fetchurl {
+                  url = "mirror://kernel/linux/kernel/people/kdave/btrfs-progs/btrfs-progs-v${version}.tar.xz";
+                  sha256 = "sha256-Rp4bLshCpuZISK5j3jAiRG+ACel19765GRkfE3y91TQ=";
+                };
+              });
             };
 
             lxd-latest = pkgs.callPackage ./packages/lxd/wrapper.nix {
               lxd-unwrapped = self'.packages.lxd-unwrapped-latest;
               OVMFFull = self'.packages.ovmf;
+              btrfs-progs = pkgs.btrfs-progs.overrideAttrs (old: rec {
+                version = "6.0";
+                src = pkgs.fetchurl {
+                  url = "mirror://kernel/linux/kernel/people/kdave/btrfs-progs/btrfs-progs-v${version}.tar.xz";
+                  sha256 = "sha256-Rp4bLshCpuZISK5j3jAiRG+ACel19765GRkfE3y91TQ=";
+                };
+              });
             };
           };
       };
