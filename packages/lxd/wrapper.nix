@@ -19,7 +19,7 @@
   linkFarm,
   makeWrapper,
   nftables,
-  OVMF,
+  OVMFFull,
   qemu_kvm,
   qemu-utils,
   rsync,
@@ -62,15 +62,15 @@
   firmware = linkFarm "lxd-firmware" [
     {
       name = "share/OVMF/OVMF_CODE.fd";
-      path = "${OVMF.fd}/FV/OVMF_CODE.fd";
+      path = "${OVMFFull.fd}/FV/OVMF_CODE.fd";
     }
     {
       name = "share/OVMF/OVMF_VARS.fd";
-      path = "${OVMF.fd}/FV/OVMF_VARS.fd";
+      path = "${OVMFFull.fd}/FV/OVMF_VARS.fd";
     }
     {
       name = "share/OVMF/OVMF_VARS.ms.fd";
-      path = "${OVMF.fd}/FV/OVMF_VARS.fd";
+      path = "${OVMFFull.fd}/FV/OVMF_VARS.fd";
     }
   ];
 
