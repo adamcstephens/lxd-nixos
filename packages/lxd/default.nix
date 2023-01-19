@@ -10,7 +10,7 @@
   lxc,
   pkg-config,
   raft-canonical,
-  sqlite-replication,
+  sqlite,
   udev,
 }: let
   generic = {
@@ -49,7 +49,7 @@
         libcap
         dqlite.dev
         raft-canonical.dev
-        sqlite-replication
+        sqlite
         udev.dev
       ];
 
