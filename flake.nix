@@ -54,19 +54,20 @@
                   raft-canonical = inputs'.nixpkgs-unstable.legacyPackages.raft-canonical;
                 };
               })
+              lxd-unwrapped-lts
               lxd-unwrapped
-              lxd-unwrapped-latest
               ;
 
             ovmf = pkgs.callPackage ./packages/ovmf {};
+
             lxd = pkgs.callPackage ./packages/lxd/wrapper.nix {
               inherit (lxdOverrides) OVMFFull btrfs-progs;
               lxd-unwrapped = self'.packages.lxd-unwrapped;
             };
 
-            lxd-latest = pkgs.callPackage ./packages/lxd/wrapper.nix {
+            lxd-lts = pkgs.callPackage ./packages/lxd/wrapper.nix {
               inherit (lxdOverrides) OVMFFull btrfs-progs;
-              lxd-unwrapped = self'.packages.lxd-unwrapped-latest;
+              lxd-unwrapped = self'.packages.lxd-unwrapped-lts;
             };
           };
       };

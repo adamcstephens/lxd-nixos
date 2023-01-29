@@ -100,16 +100,16 @@
       };
     };
 in rec {
-  lxd-unwrapped-5_0 = generic {
+  lxd-unwrapped_5_0 = generic {
     version = "5.0.2";
     hash = "sha256-gJ0+rIbZzDJ0GcQSH45r1f+qnkikXz3mGPZYKgzEzjo=";
   };
 
-  lxd-unwrapped-5_10 = generic {
+  lxd-unwrapped_5_10 = generic {
     version = "5.10";
     hash = "sha256-sYJkPr/tE22xJEjKX7fMjOLQ9zBDm52UjqbVLrm39zU=";
   };
 
-  lxd-unwrapped-latest = lxd-unwrapped-5_10;
-  lxd-unwrapped = lxd-unwrapped-5_0;
+  lxd-unwrapped = lxd-unwrapped_5_10;
+  lxd-unwrapped-lts = lxd-unwrapped_5_0;
 }
