@@ -20,46 +20,53 @@
       ];
 
       perSystem = {
+        inputs',
         pkgs,
         system,
         self',
         ...
-      }: {
+      }: let
+        lxdOverrides = {
+          OVMFFull = self'.packages.ovmf;
+          btrfs-progs = pkgs.btrfs-progs.overrideAttrs (old: rec {
+            version = "6.0";
+            src = pkgs.fetchurl {
+              url = "mirror://kernel/linux/kernel/people/kdave/btrfs-progs/btrfs-progs-v${version}.tar.xz";
+              sha256 = "sha256-Rp4bLshCpuZISK5j3jAiRG+ACel19765GRkfE3y91TQ=";
+            };
+          });
+        };
+      in {
         devShells.default = pkgs.mkShellNoCC {
           buildInputs = [
             pkgs.cachix
             pkgs.just
-            self'.packages.lxd-latest.client
+            # self'.packages.lxd-latest.client
           ];
         };
+
         packages =
           (self.imageImporters self)
           // {
-            inherit (pkgs.callPackage ./packages/lxd {}) lxd-unwrapped lxd-unwrapped-latest;
+            inherit
+              (pkgs.callPackage ./packages/lxd {
+                dqlite = inputs'.nixpkgs-unstable.legacyPackages.dqlite.override {
+                  raft-canonical = inputs'.nixpkgs-unstable.legacyPackages.raft-canonical;
+                };
+              })
+              lxd-unwrapped
+              lxd-unwrapped-latest
+              ;
 
             ovmf = pkgs.callPackage ./packages/ovmf {};
             lxd = pkgs.callPackage ./packages/lxd/wrapper.nix {
+              inherit (lxdOverrides) OVMFFull btrfs-progs;
               lxd-unwrapped = self'.packages.lxd-unwrapped;
-              OVMFFull = self'.packages.ovmf;
-              btrfs-progs = pkgs.btrfs-progs.overrideAttrs (old: rec {
-                version = "6.0";
-                src = pkgs.fetchurl {
-                  url = "mirror://kernel/linux/kernel/people/kdave/btrfs-progs/btrfs-progs-v${version}.tar.xz";
-                  sha256 = "sha256-Rp4bLshCpuZISK5j3jAiRG+ACel19765GRkfE3y91TQ=";
-                };
-              });
             };
 
             lxd-latest = pkgs.callPackage ./packages/lxd/wrapper.nix {
+              inherit (lxdOverrides) OVMFFull btrfs-progs;
               lxd-unwrapped = self'.packages.lxd-unwrapped-latest;
-              OVMFFull = self'.packages.ovmf;
-              btrfs-progs = pkgs.btrfs-progs.overrideAttrs (old: rec {
-                version = "6.0";
-                src = pkgs.fetchurl {
-                  url = "mirror://kernel/linux/kernel/people/kdave/btrfs-progs/btrfs-progs-v${version}.tar.xz";
-                  sha256 = "sha256-Rp4bLshCpuZISK5j3jAiRG+ACel19765GRkfE3y91TQ=";
-                };
-              });
             };
           };
       };
