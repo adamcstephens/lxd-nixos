@@ -41,6 +41,13 @@
           buildInputs = [
             pkgs.cachix
             pkgs.just
+            (pkgs.python3.withPackages (
+              ps:
+                with ps; [
+                  pylxd
+                  setuptools
+                ]
+            ))
             # self'.packages.lxd-latest.client
           ];
         };
@@ -76,6 +83,7 @@
       nixosModules.agent = import ./modules/agent.nix;
       nixosModules.container = import ./modules/container.nix;
       nixosModules.imageMetadata = import ./modules/image-metadata.nix;
+      nixosModules.instances = import ./modules/instances.nix;
       nixosModules.vm = import ./modules/vm.nix;
     };
 }
