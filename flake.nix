@@ -35,6 +35,7 @@
               sha256 = "sha256-Rp4bLshCpuZISK5j3jAiRG+ACel19765GRkfE3y91TQ=";
             };
           });
+          libnvidia-container = inputs'.nixpkgs-unstable.legacyPackages.callPackage "${inputs.nixpkgs-unstable.outPath}/pkgs/applications/virtualization/libnvidia-container" {};
         };
       in {
         devShells.default = pkgs.mkShellNoCC {
@@ -59,12 +60,12 @@
             ovmf = pkgs.callPackage ./packages/ovmf {};
 
             lxd = pkgs.callPackage ./packages/lxd/wrapper.nix {
-              inherit (lxdOverrides) OVMFFull;
+              inherit (lxdOverrides) OVMFFull libnvidia-container;
               lxd-unwrapped = self'.packages.lxd-unwrapped;
             };
 
             lxd-lts = pkgs.callPackage ./packages/lxd/wrapper.nix {
-              inherit (lxdOverrides) OVMFFull btrfs-progs;
+              inherit (lxdOverrides) OVMFFull btrfs-progs libnvidia-container;
               lxd-unwrapped = self'.packages.lxd-unwrapped-lts;
             };
           };

@@ -16,6 +16,7 @@
   kmod,
   lxd-unwrapped,
   lib,
+  libnvidia-container,
   linkFarm,
   makeWrapper,
   nftables,
@@ -46,6 +47,7 @@
       gzip
       iproute2
       iptables
+      libnvidia-container
       kmod
       nftables
       rsync
