@@ -50,9 +50,7 @@
           // {
             inherit
               (pkgs.callPackage ./packages/lxd {
-                dqlite = inputs'.nixpkgs-unstable.legacyPackages.dqlite.override {
-                  raft-canonical = inputs'.nixpkgs-unstable.legacyPackages.raft-canonical;
-                };
+                inherit (inputs'.nixpkgs-unstable.legacyPackages) dqlite raft-canonical;
               })
               lxd-unwrapped-lts
               lxd-unwrapped
@@ -61,7 +59,7 @@
             ovmf = pkgs.callPackage ./packages/ovmf {};
 
             lxd = pkgs.callPackage ./packages/lxd/wrapper.nix {
-              inherit (lxdOverrides) OVMFFull btrfs-progs;
+              inherit (lxdOverrides) OVMFFull;
               lxd-unwrapped = self'.packages.lxd-unwrapped;
             };
 
