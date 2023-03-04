@@ -8,12 +8,14 @@
   cdrkit,
   criu,
   dnsmasq,
+  gawk,
   gnutar,
   gptfdisk,
   gzip,
   iproute2,
   iptables,
   kmod,
+  lxc,
   lxd-unwrapped,
   lib,
   libnvidia-container,
@@ -85,9 +87,14 @@ in
 
     nativeBuildInputs = [makeWrapper];
     postBuild = ''
-      wrapProgram $out/bin/lxd --prefix PATH : ${lib.makeBinPath binPath}:$out/bin ${
+      wrapProgram $out/bin/lxd --prefix PATH : ${lib.makeBinPath binPath}:$out/bin --set LXD_LXC_HOOK $out/share/lxc/hooks ${
         lib.optionalString useQemu " --set LXD_OVMF_PATH ${LXD_OVMF_PATH}"
       }
+
+      # support nvidia.runtime=true. just a shell script so avoid including all of lxc
+      mkdir -p $out/share/lxc/hooks
+      cp ${lxc}/share/lxc/hooks/nvidia $out/share/lxc/hooks/
+      wrapProgram $out/share/lxc/hooks/nvidia --prefix PATH : ${lib.makeBinPath [gawk libnvidia-container]}
     '';
 
     passthru.tests = {
