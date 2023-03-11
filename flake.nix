@@ -12,7 +12,7 @@
     ...
   } @ inputs:
     flake-parts.lib.mkFlake {inherit inputs;} {
-      systems = ["x86_64-linux"];
+      systems = ["aarch64-linux" "x86_64-linux"];
 
       imports = [
         ./images.nix
