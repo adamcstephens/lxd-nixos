@@ -17,6 +17,7 @@
       imports = [
         ./images.nix
         ./importer.nix
+        ./server.nix
       ];
 
       perSystem = {
@@ -74,6 +75,7 @@
       nixosModules.agent = import ./modules/agent.nix;
       nixosModules.container = import ./modules/container.nix;
       nixosModules.imageMetadata = import ./modules/image-metadata.nix;
+      nixosModules.server = import ./modules/server.nix;
       nixosModules.vm = import ./modules/vm.nix;
     };
 }
