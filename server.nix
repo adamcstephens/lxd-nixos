@@ -12,15 +12,29 @@
         {
           virtualisation.lxd = {
             preseed = {
+              networks = [
+                {
+                  name = "lxd-my-bridge";
+                  type = "bridge";
+                  config = {
+                    "ipv4.address" = "none";
+                    "ipv6.address" = "none";
+                  };
+                }
+              ];
               profiles = [
                 {
                   name = "testprofile";
-                  devices = {
-                    testdevice = {
-                      # name = "td";
-                      gpu = "true";
-                    };
+                  config = {
+                    myconfig = "true";
+                    "boot.autostart" = "false";
                   };
+                  # devices = {
+                  #   testdevice = {
+                  #     # name = "td";
+                  #     gpu = "true";
+                  #   };
+                  # };
                 }
               ];
             };
