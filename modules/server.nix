@@ -190,6 +190,11 @@ in {
           inherit networks profiles storage_pools;
         };
       });
+      description = lib.mdDoc ''
+        Preseed configuration. See https://linuxcontainers.org/lxd/docs/latest/howto/initialize/#non-interactive-configuration
+
+        Changes to this will be re-applied to LXD which will overwrite existing entities or create missing ones
+      '';
     };
   };
 
