@@ -8,36 +8,6 @@
 
   preseedYAML = pkgs.writeText "lxd-preseed" (lib.generators.toYAML {} cfg.preseed);
 
-  # device = lib.types.submodule ({
-  #   name,
-  #   config,
-  #   ...
-  # }: {
-  #   options = {
-  #     name = lib.mkOption {
-  #       default = name;
-  #       type = lib.types.str;
-  #       description = lib.mdDoc ''
-  #         Name of the device
-  #       '';
-  #     };
-
-  #     deviceConfig = lib.mkOption {
-  #       default = config;
-  #       type = lib.types.attrsOf lib.types.str;
-  #     };
-  #   };
-  # });
-
-  # device = lib.mkOption {
-  #   type = lib.types.attrsOf lib.types.str;
-  # };
-
-  config = lib.mkOption {
-    default = null;
-    type = lib.types.nullOr (lib.types.attrsOf lib.types.str);
-  };
-
   devices = lib.mkOption {
     default = null;
     type = lib.types.nullOr (lib.types.attrsOf (lib.types.attrsOf lib.types.str));
@@ -53,20 +23,30 @@
       };
 
       description = lib.mkOption {
-        type = lib.types.str;
+        type = lib.types.nullOr lib.types.str;
         description = lib.mdDoc ''
           Description of the profile
         '';
+        default = null;
       };
 
       project = lib.mkOption {
-        type = lib.types.str;
+        type = lib.types.nullOr lib.types.str;
         description = lib.mdDoc ''
           Project to associate profile to
         '';
+        default = null;
       };
 
-      inherit config devices;
+      config = lib.mkOption {
+        default = null;
+        description = lib.mdDoc ''
+          Instance configuration map (refer to doc/instances.md)
+        '';
+        type = lib.types.nullOr (lib.types.attrsOf lib.types.str);
+      };
+
+      inherit devices;
     };
   };
 
@@ -118,7 +98,13 @@
         '';
       };
 
-      inherit config;
+      config = lib.mkOption {
+        default = null;
+        description = lib.mdDoc ''
+          Network configuration map (refer to doc/networks.md)
+        '';
+        type = lib.types.nullOr (lib.types.attrsOf lib.types.str);
+      };
     };
   };
 
@@ -129,13 +115,79 @@
     '';
     default = [];
   };
+
+  storage_pool = lib.types.submodule {
+    options = {
+      name = lib.mkOption {
+        type = lib.types.str;
+        description = lib.mdDoc ''
+          Name of the storage pool
+        '';
+      };
+
+      description = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        description = lib.mdDoc ''
+          Description of the pool
+        '';
+        default = null;
+      };
+
+      project = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        description = lib.mdDoc ''
+          Project to associate storage pool to
+        '';
+        default = null;
+      };
+
+      target = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        description = lib.mdDoc ''
+          Cluster member name for target
+        '';
+        default = null;
+      };
+
+      driver = lib.mkOption {
+        type = lib.types.str;
+        description = lib.mdDoc ''
+          Storage pool driver (btrfs, ceph, cephfs, dir, lvm or zfs)
+        '';
+      };
+
+      config = lib.mkOption {
+        default = null;
+        description = lib.mdDoc ''
+          Storage pool configuration map (refer to doc/storage.md)
+        '';
+        type = lib.types.nullOr (lib.types.attrsOf lib.types.str);
+      };
+    };
+  };
+
+  storage_pools = lib.mkOption {
+    type = lib.types.listOf storage_pool;
+    description = lib.mdDoc ''
+      List of storage pools
+    '';
+    default = [];
+  };
 in {
   options.virtualisation.lxd = {
     preseed = lib.mkOption {
       default = null;
       type = lib.types.nullOr (lib.types.submodule {
         options = {
-          inherit networks profiles;
+          config = lib.mkOption {
+            default = null;
+            description = lib.mdDoc ''
+              Daemon configuration
+            '';
+            type = lib.types.nullOr (lib.types.attrsOf lib.types.str);
+          };
+
+          inherit networks profiles storage_pools;
         };
       });
     };

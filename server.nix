@@ -37,6 +37,15 @@
                   # };
                 }
               ];
+              storage_pools = [
+                {
+                  name = "data";
+                  driver = "zfs";
+                  config = {
+                    source = "my-zfs-pool/my-zfs-dataset";
+                  };
+                }
+              ];
             };
           };
         }
