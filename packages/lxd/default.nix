@@ -106,8 +106,8 @@ in rec {
   };
 
   lxd-unwrapped_5_11 = generic {
-    version = "5.11";
-    hash = "sha256-6z6C1nWmnHLdLtLf7l1f4riGhuP2J2mt8mVWZIiege0=";
+    version = "5.12";
+    hash = "sha256-YGH/M0aw56snNt3s8drcJYHZPYkVW993YilF228nMhw=";
   };
 
   lxd-unwrapped = lxd-unwrapped_5_11;
