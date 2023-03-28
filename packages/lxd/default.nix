@@ -2,6 +2,7 @@
   acl,
   buildGoModule,
   dqlite,
+  fetchpatch,
   fetchurl,
   hwdata,
   installShellFiles,
@@ -33,6 +34,15 @@
       vendorSha256 = null;
 
       outputs = ["out" "client"];
+
+      patches = [
+        # remove on 5.13 https://github.com/lxc/lxd/pull/11480
+        (fetchpatch {
+          name = "vmgenid-aarch64.patch";
+          url = "https://github.com/lxc/lxd/pull/11480.patch";
+          sha256 = "sha256-B9GnLlpJDBFZLqsfAziXs8KzpzcAvIZvuSVrCnBSlm0=";
+        })
+      ];
 
       postPatch = ''
         substituteInPlace shared/usbid/load.go \
