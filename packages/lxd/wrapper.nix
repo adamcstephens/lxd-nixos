@@ -8,6 +8,7 @@
   cdrkit,
   criu,
   dnsmasq,
+  e2fsprogs,
   gnutar,
   gptfdisk,
   gzip,
@@ -41,6 +42,7 @@
       cdrkit
       criu
       dnsmasq
+      e2fsprogs
       gnutar
       gptfdisk
       gzip
