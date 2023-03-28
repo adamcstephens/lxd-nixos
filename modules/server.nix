@@ -30,14 +30,6 @@
         default = null;
       };
 
-      project = lib.mkOption {
-        type = lib.types.nullOr lib.types.str;
-        description = lib.mdDoc ''
-          Project to associate profile to
-        '';
-        default = null;
-      };
-
       config = lib.mkOption {
         default = null;
         description = lib.mdDoc ''
@@ -83,14 +75,6 @@
         default = null;
       };
 
-      target = lib.mkOption {
-        type = lib.types.nullOr lib.types.str;
-        description = lib.mdDoc ''
-          Cluster member name for target
-        '';
-        default = null;
-      };
-
       type = lib.mkOption {
         type = lib.types.str;
         description = lib.mdDoc ''
@@ -129,22 +113,6 @@
         type = lib.types.nullOr lib.types.str;
         description = lib.mdDoc ''
           Description of the pool
-        '';
-        default = null;
-      };
-
-      project = lib.mkOption {
-        type = lib.types.nullOr lib.types.str;
-        description = lib.mdDoc ''
-          Project to associate storage pool to
-        '';
-        default = null;
-      };
-
-      target = lib.mkOption {
-        type = lib.types.nullOr lib.types.str;
-        description = lib.mdDoc ''
-          Cluster member name for target
         '';
         default = null;
       };
