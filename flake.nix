@@ -16,7 +16,8 @@
 
       imports = [
         ./images.nix
-        ./importer.nix
+        ./parts/images.nix
+
         ./server.nix
       ];
 
@@ -46,29 +47,27 @@
           ];
         };
 
-        packages =
-          (self.imageImporters self)
-          // {
-            inherit
-              (pkgs.callPackage ./packages/lxd {
-                inherit (inputs'.nixpkgs-unstable.legacyPackages) dqlite raft-canonical;
-              })
-              lxd-unwrapped-lts
-              lxd-unwrapped
-              ;
+        packages = {
+          inherit
+            (pkgs.callPackage ./packages/lxd {
+              inherit (inputs'.nixpkgs-unstable.legacyPackages) dqlite raft-canonical;
+            })
+            lxd-unwrapped-lts
+            lxd-unwrapped
+            ;
 
-            ovmf = pkgs.callPackage ./packages/ovmf {};
+          ovmf = pkgs.callPackage ./packages/ovmf {};
 
-            lxd = pkgs.callPackage ./packages/lxd/wrapper.nix {
-              inherit (lxdOverrides) OVMFFull;
-              lxd-unwrapped = self'.packages.lxd-unwrapped;
-            };
-
-            lxd-lts = pkgs.callPackage ./packages/lxd/wrapper.nix {
-              inherit (lxdOverrides) OVMFFull btrfs-progs;
-              lxd-unwrapped = self'.packages.lxd-unwrapped-lts;
-            };
+          lxd = pkgs.callPackage ./packages/lxd/wrapper.nix {
+            inherit (lxdOverrides) OVMFFull;
+            lxd-unwrapped = self'.packages.lxd-unwrapped;
           };
+
+          lxd-lts = pkgs.callPackage ./packages/lxd/wrapper.nix {
+            inherit (lxdOverrides) OVMFFull btrfs-progs;
+            lxd-unwrapped = self'.packages.lxd-unwrapped-lts;
+          };
+        };
       };
     }
     // {
@@ -76,6 +75,8 @@
       nixosModules.container = import ./modules/container.nix;
       nixosModules.imageMetadata = import ./modules/image-metadata.nix;
       nixosModules.server = import ./modules/server.nix;
-      nixosModules.vm = import ./modules/vm.nix;
+      nixosModules.virtual-machine = import ./modules/virtual-machine.nix;
+
+      flakeModules.images = ./parts/images.nix;
     };
 }

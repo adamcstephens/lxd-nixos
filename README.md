@@ -14,8 +14,8 @@ Features:
 Use these commands to build images for both containers and VMs and then import them into LXD
 
 ```
-nix run git+https://codeberg.org/adamcstephens/lxd-nixos#lxd-import-image-container-2211
-nix run git+https://codeberg.org/adamcstephens/lxd-nixos#lxd-import-image-container-unstable
+nix run git+https://codeberg.org/adamcstephens/lxd-nixos#import/nixos/2211/container
+nix run git+https://codeberg.org/adamcstephens/lxd-nixos#import/nixos/unstable/container
 
 # now available for running
 lxc launch nixos/22.11/container test1
@@ -35,10 +35,10 @@ Nixpkgs provides an LXD package, but it is missing multiple features. While effo
 
 The following packages are provided
 
-* `lxd` - LTS release of LXD, currently 5.0.x
-* `lxd.client` - LTS client only
-* `lxd-latest` - Latest point release of LXD, currently 5.9
-* `lxd-latest.client` - Latest client
+* `lxd` - Latest release of LXD
+* `lxd.client` - Latest client
+* `lxd-lts` - LTS release of LXD, currently 5.0.x
+* `lxd-lts.client` - LTS client only
 
 ## NixOS Modules
 
@@ -56,7 +56,7 @@ Use one of the following to configure a nixosConfiguration as an LXD guest.
 
 ```
   imports = [
-    inputs.lxd-nixos.nixosModules.vm
+    inputs.lxd-nixos.nixosModules.virtual-machine
   ];
 ```
 

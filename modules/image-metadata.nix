@@ -107,7 +107,7 @@ in {
               properties = {
                 description = "NixOS ${config.system.nixos.codeName} ${config.system.nixos.label} ${pkgs.system}";
                 os = "nixos";
-                release = "${config.system.nixos.codeName}";
+                release = "${config.system.nixos.label}";
               };
               templates = templates.properties;
             };
