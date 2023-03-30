@@ -4,7 +4,12 @@
   pkgs,
   modulesPath,
   ...
-}: {
+}: let
+  serialDevice =
+    if pkgs.stdenv.hostPlatform.isx86
+    then "ttyS0"
+    else "ttyAMA0";
+in {
   options = {
     lxd-image-vm = {
       vmDerivationName = lib.mkOption {
@@ -48,8 +53,10 @@
 
     boot.growPartition = true;
     boot.loader.systemd-boot.enable = true;
-    boot.kernelParams = ["console=tty1" "console=ttyS0"];
-    systemd.services."serial-getty@ttyS0" = {
+
+    boot.kernelParams = ["console=tty1" "console=${serialDevice}"];
+
+    systemd.services."serial-getty@${serialDevice}" = {
       enable = true;
       wantedBy = ["getty.target"];
       serviceConfig.Restart = "always";
