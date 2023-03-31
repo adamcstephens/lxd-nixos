@@ -1,101 +1,101 @@
-{
-  withSystem,
-  inputs,
-  self,
-  lib,
-  ...
-}: let
-  mkImage = {
-    type,
-    nixosRelease,
-    system,
-    metadata ? {},
-  }: let
-    normalizeRelease = builtins.replaceStrings ["."] [""] nixosRelease;
-    releaseName = "image-${type}-${normalizeRelease}";
+{inputs, ...}: let
+  commonConfig = {
+    networking.hostName = "";
+    lxd.image.templates = {
+      "hostname" = {
+        enable = true;
+        target = "/etc/hostname";
+        template = builtins.toFile "hostname.tpl" "{{ instance.name }}";
+        when = ["start"];
+      };
+    };
+  };
+in {
+  config.lxd.images = {
+    #
+    # 22.11
+    #
+    container-2211-x86_64 = {
+      release = "22.11";
+      nixpkgs = inputs.nixpkgs;
 
-    imageTag = metadata.imageName or "${nixosRelease}/${type}";
-    imageRelease = "nixos/${imageTag}";
+      system = "x86_64-linux";
+      type = "container";
 
-    importerName = "lxd-import-${releaseName}";
-
-    inputNixpkgsRelease = "nixpkgs-" + normalizeRelease;
-    pkgs = inputs.${inputNixpkgsRelease}.legacyPackages.${system};
-  in {
-    flake.checks.${system}.${releaseName} = import ./nixos-test.nix {
-      inherit pkgs type;
-
-      makeTest = import (pkgs.path + "/nixos/tests/make-test-python.nix");
-      testName = releaseName;
-
-      importerBin = self.packages.${system}.${importerName} + "/bin/import";
-      image = imageRelease;
-
-      lxd = self.packages.${system}.lxd-latest;
+      config = commonConfig;
     };
 
-    flake.nixosConfigurations.${releaseName} = withSystem system ({...}:
-      inputs.${inputNixpkgsRelease}.lib.nixosSystem {
-        system = system;
-        modules = [
-          self.nixosModules.${type}
-          {
-            system.stateVersion = nixosRelease;
+    virtual-machine-2211-x86_64 = {
+      release = "22.11";
+      nixpkgs = inputs.nixpkgs;
 
-            _module.args.lxd = metadata;
-          }
-        ];
-      });
+      system = "x86_64-linux";
+      type = "virtual-machine";
+
+      config = commonConfig;
+    };
+
+    container-2211-aarch64 = {
+      release = "22.11";
+      nixpkgs = inputs.nixpkgs;
+
+      system = "aarch64-linux";
+      type = "container";
+
+      config = commonConfig;
+    };
+
+    virtual-machine-2211-aarch64 = {
+      release = "22.11";
+      nixpkgs = inputs.nixpkgs;
+
+      system = "aarch64-linux";
+      type = "virtual-machine";
+
+      config = commonConfig;
+    };
+
+    #
+    # unstable
+    #
+    container-unstable-x86_64 = {
+      release = "unstable";
+      nixpkgs = inputs.nixpkgs-unstable;
+
+      system = "x86_64-linux";
+      type = "container";
+
+      config = commonConfig;
+    };
+
+    virtual-machine-unstable-x86_64 = {
+      release = "unstable";
+      nixpkgs = inputs.nixpkgs-unstable;
+
+      system = "x86_64-linux";
+      type = "virtual-machine";
+
+      config = commonConfig;
+    };
+
+    container-unstable-aarch64 = {
+      release = "unstable";
+      nixpkgs = inputs.nixpkgs-unstable;
+
+      system = "aarch64-linux";
+      type = "container";
+
+      config = commonConfig;
+    };
+
+    virtual-machine-unstable-aarch64 = {
+      release = "unstable";
+      nixpkgs = inputs.nixpkgs-unstable;
+
+      system = "aarch64-linux";
+      type = "virtual-machine";
+
+      config = commonConfig;
+    };
   };
-in
-  builtins.foldl' (l: r:
-    lib.attrsets.recursiveUpdate l r) {} [
-    (mkImage {
-      system = "x86_64-linux";
-      type = "container";
-      nixosRelease = "22.11";
-      metadata.imageName = "22.11/container";
-    })
-    (mkImage {
-      system = "x86_64-linux";
-      type = "vm";
-      nixosRelease = "22.11";
-      metadata.imageName = "22.11/vm";
-    })
-    (mkImage {
-      system = "x86_64-linux";
-      type = "container";
-      nixosRelease = "unstable";
-      metadata.imageName = "unstable/container";
-    })
-    (mkImage {
-      system = "x86_64-linux";
-      type = "vm";
-      nixosRelease = "unstable";
-      metadata.imageName = "unstable/vm";
-    })
-    (mkImage {
-      system = "aarch64-linux";
-      type = "container";
-      nixosRelease = "22.11";
-      metadata.imageName = "22.11/container";
-    })
-    (mkImage {
-      system = "aarch64-linux";
-      type = "vm";
-      nixosRelease = "22.11";
-      metadata.imageName = "22.11/vm";
-    })
-    (mkImage {
-      system = "aarch64-linux";
-      type = "container";
-      nixosRelease = "unstable";
-      metadata.imageName = "unstable/container";
-    })
-    (mkImage {
-      system = "aarch64-linux";
-      type = "vm";
-      nixosRelease = "unstable";
-      metadata.imageName = "unstable/vm";
-    })
-  ]
+}

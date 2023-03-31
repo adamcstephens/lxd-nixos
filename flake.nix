@@ -16,66 +16,18 @@
 
       imports = [
         ./images.nix
-        ./importer.nix
-        ./server.nix
+
+        ./parts/devshell.nix
+        ./parts/images.nix
+        ./parts/packages.nix
       ];
 
-      perSystem = {
-        inputs',
-        pkgs,
-        system,
-        self',
-        ...
-      }: let
-        lxdOverrides = {
-          OVMFFull = self'.packages.ovmf;
-          btrfs-progs = pkgs.btrfs-progs.overrideAttrs (old: rec {
-            version = "6.0";
-            src = pkgs.fetchurl {
-              url = "mirror://kernel/linux/kernel/people/kdave/btrfs-progs/btrfs-progs-v${version}.tar.xz";
-              sha256 = "sha256-Rp4bLshCpuZISK5j3jAiRG+ACel19765GRkfE3y91TQ=";
-            };
-          });
-        };
-      in {
-        devShells.default = pkgs.mkShellNoCC {
-          buildInputs = [
-            pkgs.cachix
-            pkgs.just
-            # self'.packages.lxd-latest.client
-          ];
-        };
+      flake.nixosModules.agent = import ./modules/agent.nix;
+      flake.nixosModules.container = import ./modules/container.nix;
+      flake.nixosModules.imageMetadata = import ./modules/image-metadata.nix;
+      flake.nixosModules.server = import ./modules/server.nix;
+      flake.nixosModules.virtual-machine = import ./modules/virtual-machine.nix;
 
-        packages =
-          (self.imageImporters self)
-          // {
-            inherit
-              (pkgs.callPackage ./packages/lxd {
-                inherit (inputs'.nixpkgs-unstable.legacyPackages) dqlite raft-canonical;
-              })
-              lxd-unwrapped-lts
-              lxd-unwrapped
-              ;
-
-            ovmf = pkgs.callPackage ./packages/ovmf {};
-
-            lxd = pkgs.callPackage ./packages/lxd/wrapper.nix {
-              inherit (lxdOverrides) OVMFFull;
-              lxd-unwrapped = self'.packages.lxd-unwrapped;
-            };
-
-            lxd-lts = pkgs.callPackage ./packages/lxd/wrapper.nix {
-              inherit (lxdOverrides) OVMFFull btrfs-progs;
-              lxd-unwrapped = self'.packages.lxd-unwrapped-lts;
-            };
-          };
-      };
-    }
-    // {
-      nixosModules.agent = import ./modules/agent.nix;
-      nixosModules.container = import ./modules/container.nix;
-      nixosModules.imageMetadata = import ./modules/image-metadata.nix;
-      nixosModules.server = import ./modules/server.nix;
-      nixosModules.vm = import ./modules/vm.nix;
+      flake.flakeModules.images = ./parts/images.nix;
     };
 }

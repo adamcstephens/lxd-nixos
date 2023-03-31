@@ -10,18 +10,6 @@
     then "ttyS0"
     else "ttyAMA0";
 in {
-  options = {
-    lxd-image-vm = {
-      vmDerivationName = lib.mkOption {
-        type = lib.types.str;
-        default = "nixos-lxd-${config.system.nixos.label}-${pkgs.stdenv.hostPlatform.system}";
-        description = ''
-          The name of the derivation for the LXD VM image.
-        '';
-      };
-    };
-  };
-
   imports = [
     (modulesPath + "/profiles/qemu-guest.nix")
     ./agent.nix
@@ -30,7 +18,7 @@ in {
 
   config = {
     system.build.qemuImage = import (modulesPath + "/../lib/make-disk-image.nix") {
-      name = config.lxd-image-vm.vmDerivationName;
+      name = "nixos-lxd-${config.system.nixos.label}-${pkgs.stdenv.hostPlatform.system}";
 
       inherit pkgs lib config;
 
