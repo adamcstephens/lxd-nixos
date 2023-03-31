@@ -2,7 +2,7 @@
 # $ nix build .\#checks.x86_64-linux.nixos-test.driver
 # $ ./result/bin/nixos-test-driver --interactive
 # >>> start_all()
-# >>> server.shell_interact()
+# >>> machine.shell_interact()
 {
   image,
   importerBin,
@@ -20,15 +20,11 @@
       then "--vm --config security.secureboot=false"
       else ""
     );
-  sleep =
-    if type == "virtual-machine"
-    then "60"
-    else "10";
 in
   makeTest {
     name = testName;
 
-    nodes.server = {...}: {
+    nodes.machine = {...}: {
       boot.kernelModules = ["vhost_vsock"];
 
       virtualisation.cores = 2;
@@ -42,15 +38,20 @@ in
     };
 
     testScript = ''
+      def instance_is_up(_) -> bool:
+        status, _ = machine.execute("lxc exec ${runName} --disable-stdin --force-interactive true")
+        return status == 0
+
       start_all()
-      server.wait_for_unit("lxd.service")
-      server.succeed("lxd init --minimal")
-      server.succeed("${importerBin}")
-      server.succeed("lxc image list -f compact")
-      server.succeed("${launchCommand}")
-      server.succeed("sleep ${sleep}")
-      server.succeed("lxc list -f compact")
-      server.succeed("lxc exec ${runName} --force-interactive true")
+      machine.wait_for_unit("lxd.service")
+
+      machine.succeed("lxd init --minimal")
+      machine.succeed("${importerBin}")
+      machine.succeed("${launchCommand}")
+      machine.sleep(2)
+
+      with machine.nested("Waiting for instance to start and lxd-agent to be online"):
+        retry(instance_is_up)
     '';
   } {
     inherit pkgs;
