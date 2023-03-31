@@ -153,7 +153,7 @@ in {
 
           check.${config.system}.${safeName} = withSystem config.system (
             {pkgs, ...}:
-              import ../nixos-test.nix {
+              import ../lib/nixos-test.nix {
                 inherit pkgs;
                 inherit (config) type;
 
