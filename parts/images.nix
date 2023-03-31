@@ -67,7 +67,7 @@ in {
 
           imageName = lib.mkOption {
             type = lib.types.nullOr lib.types.str;
-            description = lib.mdDoc "Override release/type based image naming";
+            description = lib.mdDoc "Override release/type based image namingnamintype";
             default = "${config.release}/${config.type}";
           };
 
@@ -108,43 +108,20 @@ in {
             description = lib.mdDoc "nixosConfiguration to be added to the flake";
             readOnly = true;
           };
-
-          appSafeName = lib.mkOption {
-            type = lib.types.str;
-            readOnly = true;
-            default = "import/${config.safeName}";
-          };
-
-          importName = lib.mkOption {
-            type = lib.types.str;
-            readOnly = true;
-            description = lib.mdDoc "Normalized name import script name";
-            default = "import-${config.type}-${config.normalizedRelease}";
-          };
-
-          safeName = lib.mkOption {
-            type = lib.types.str;
-            readOnly = true;
-            description = lib.mdDoc "Normalized name for checks";
-            default = "nixos/" + (builtins.replaceStrings ["."] [""] config.imageName);
-          };
-
-          normalizedRelease = lib.mkOption {
-            type = lib.types.str;
-            readOnly = true;
-            description = lib.mdDoc "Remove periods from release where required, `22.11` -> `2211`";
-            default = builtins.replaceStrings ["."] [""] config.release;
-          };
         };
 
-        config = {
+        config = let
+          normalizedRelease = builtins.replaceStrings ["."] [""] config.release;
+          safeName = "nixos/" + (builtins.replaceStrings ["."] [""] config.imageName);
+          appSafeName = "import/${safeName}";
+        in {
           imageFile =
             if (config.type == "virtual-machine")
             then config.nixosConfiguration.config.system.build.qemuImage + "/nixos.qcow2"
             else config.nixosConfiguration.config.system.build.squashfs;
 
           importScript = withSystem config.system ({pkgs, ...}:
-            pkgs.writeScript config.importName ''
+            pkgs.writeScript "import-${config.type}-${normalizedRelease}" ''
               [ -n "$1" ] && REMOTE="$1:"
 
                echo ":: Running importer ${config.imageAlias}"
@@ -158,7 +135,8 @@ in {
             inherit (config) system;
 
             modules = [
-              self.nixosModules.${config.type}
+              ../modules/${config.type}.nix
+
               config.config
               {
                 system.stateVersion = config.release;
@@ -168,12 +146,12 @@ in {
             ];
           };
 
-          app.${config.system}.${config.appSafeName} = {
+          app.${config.system}.${appSafeName} = {
             type = "app";
             program = builtins.toString config.importScript;
           };
 
-          check.${config.system}.${config.safeName} = withSystem config.system (
+          check.${config.system}.${safeName} = withSystem config.system (
             {pkgs, ...}:
               import ../nixos-test.nix {
                 inherit pkgs;
@@ -193,10 +171,12 @@ in {
     };
   };
 
-  config.flake.nixosConfigurations = nixosConfigurations;
-  config.perSystem = {system, ...}: {
-    # fold any matching apps/checks back into an attrset
-    apps = lib.mkIf (builtins.hasAttr system apps) (lib.foldl (acc: i: acc // i) {} apps.${system});
-    checks = lib.mkIf (builtins.hasAttr system checks) (lib.foldl (acc: i: acc // i) {} checks.${system});
+  config = {
+    flake.nixosConfigurations = nixosConfigurations;
+
+    perSystem = {system, ...}: {
+      apps = lib.mkIf (builtins.hasAttr system apps) (lib.mkMerge apps.${system});
+      checks = lib.mkIf (builtins.hasAttr system checks) (lib.mkMerge checks.${system});
+    };
   };
 }
