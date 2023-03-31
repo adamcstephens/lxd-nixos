@@ -35,7 +35,7 @@
 
       outputs = ["out" "client"];
 
-      patches = [
+      patches = lib.optionals (lib.versionAtLeast version "5.12") [
         # remove on 5.13 https://github.com/lxc/lxd/pull/11480
         (fetchpatch {
           name = "vmgenid-aarch64.patch";
