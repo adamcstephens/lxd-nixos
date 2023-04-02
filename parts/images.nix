@@ -169,6 +169,35 @@ in {
         };
       }));
     };
+
+    lxd.imageDefaults = {
+      baseConfig = lib.mkOption {
+        type = lib.types.unspecified;
+        description = lib.mdDoc "NixOS configuration that is inherited in all images";
+        default = {
+          networking.hostName = "";
+          lxd.image.templates = {
+            "hostname" = {
+              enable = true;
+              target = "/etc/hostname";
+              template = builtins.toFile "hostname.tpl" "{{ instance.name }}";
+              when = ["start"];
+            };
+          };
+        };
+      };
+      extraConfig = lib.mkOption {
+        type = lib.types.unspecified;
+        description = lib.mdDoc "Extra NixOS configuration to be merged with `lxd.imageDefaults.config";
+        default = {};
+      };
+
+      config = lib.mkOption {
+        type = lib.types.unspecified;
+        description = lib.mdDoc "Final Nixos configuration for base images";
+        readOnly = true;
+      };
+    };
   };
 
   config = {
@@ -178,5 +207,7 @@ in {
       apps = lib.mkIf (builtins.hasAttr system apps) (lib.mkMerge apps.${system});
       checks = lib.mkIf (builtins.hasAttr system checks) (lib.mkMerge checks.${system});
     };
+
+    lxd.imageDefaults.config = lib.recursiveUpdate config.lxd.imageDefaults.baseConfig config.lxd.imageDefaults.extraConfig;
   };
 }

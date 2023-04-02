@@ -29,5 +29,6 @@
       flake.nixosModules.virtual-machine = import ./modules/virtual-machine.nix;
 
       flake.flakeModules.images = ./parts/images.nix;
+      flake.flakeModules.baseImages = ./images.nix;
     };
 }

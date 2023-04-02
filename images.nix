@@ -1,16 +1,8 @@
-{inputs, ...}: let
-  commonConfig = {
-    networking.hostName = "";
-    lxd.image.templates = {
-      "hostname" = {
-        enable = true;
-        target = "/etc/hostname";
-        template = builtins.toFile "hostname.tpl" "{{ instance.name }}";
-        when = ["start"];
-      };
-    };
-  };
-in {
+{
+  config,
+  inputs,
+  ...
+}: {
   config.lxd.images = {
     #
     # 22.11
@@ -22,7 +14,7 @@ in {
       system = "x86_64-linux";
       type = "container";
 
-      config = commonConfig;
+      config = config.lxd.imageDefaults.config;
     };
 
     virtual-machine-2211-x86_64 = {
@@ -32,7 +24,7 @@ in {
       system = "x86_64-linux";
       type = "virtual-machine";
 
-      config = commonConfig;
+      config = config.lxd.imageDefaults.config;
     };
 
     container-2211-aarch64 = {
@@ -42,7 +34,7 @@ in {
       system = "aarch64-linux";
       type = "container";
 
-      config = commonConfig;
+      config = config.lxd.imageDefaults.config;
     };
 
     virtual-machine-2211-aarch64 = {
@@ -52,7 +44,7 @@ in {
       system = "aarch64-linux";
       type = "virtual-machine";
 
-      config = commonConfig;
+      config = config.lxd.imageDefaults.config;
     };
 
     #
@@ -65,7 +57,7 @@ in {
       system = "x86_64-linux";
       type = "container";
 
-      config = commonConfig;
+      config = config.lxd.imageDefaults.config;
     };
 
     virtual-machine-unstable-x86_64 = {
@@ -75,7 +67,7 @@ in {
       system = "x86_64-linux";
       type = "virtual-machine";
 
-      config = commonConfig;
+      config = config.lxd.imageDefaults.config;
     };
 
     container-unstable-aarch64 = {
@@ -85,7 +77,7 @@ in {
       system = "aarch64-linux";
       type = "container";
 
-      config = commonConfig;
+      config = config.lxd.imageDefaults.config;
     };
 
     virtual-machine-unstable-aarch64 = {
@@ -95,7 +87,7 @@ in {
       system = "aarch64-linux";
       type = "virtual-machine";
 
-      config = commonConfig;
+      config = config.lxd.imageDefaults.config;
     };
   };
 }
