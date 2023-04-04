@@ -30,36 +30,35 @@
   writeShellScriptBin,
   xz,
   nixosTests,
-  useQemu ? true,
 }: let
   lxd = lxd-unwrapped;
-  binPath =
-    [
-      acl
-      attr
-      bash
-      btrfs-progs
-      cdrkit
-      criu
-      dnsmasq
-      e2fsprogs
-      gnutar
-      gptfdisk
-      gzip
-      iproute2
-      iptables
-      kmod
-      nftables
-      rsync
-      squashfsTools
-      util-linux
-      xz
+  binPath = [
+    acl
+    attr
+    bash
+    btrfs-progs
+    cdrkit
+    criu
+    dnsmasq
+    e2fsprogs
+    gnutar
+    gptfdisk
+    gzip
+    iproute2
+    iptables
+    kmod
+    nftables
+    qemu_kvm
+    qemu-utils
+    rsync
+    squashfsTools
+    util-linux
+    xz
 
-      (writeShellScriptBin "apparmor_parser" ''
-        exec '${apparmor-parser}/bin/apparmor_parser' -I '${apparmor-profiles}/etc/apparmor.d' "$@"
-      '')
-    ]
-    ++ (lib.optionals useQemu [qemu-utils qemu_kvm]);
+    (writeShellScriptBin "apparmor_parser" ''
+      exec '${apparmor-parser}/bin/apparmor_parser' -I '${apparmor-profiles}/etc/apparmor.d' "$@"
+    '')
+  ];
 
   firmware = linkFarm "lxd-firmware" [
     {
@@ -85,9 +84,7 @@ in
 
     nativeBuildInputs = [makeWrapper];
     postBuild = ''
-      wrapProgram $out/bin/lxd --prefix PATH : ${lib.makeBinPath binPath}:$out/bin ${
-        lib.optionalString useQemu " --set LXD_OVMF_PATH ${LXD_OVMF_PATH}"
-      }
+      wrapProgram $out/bin/lxd --prefix PATH : ${lib.makeBinPath binPath}:${qemu_kvm}/libexec:$out/bin --set LXD_OVMF_PATH ${LXD_OVMF_PATH}
     '';
 
     passthru.tests = {
