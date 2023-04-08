@@ -9,6 +9,7 @@
   criu,
   dnsmasq,
   e2fsprogs,
+  getent,
   gnutar,
   gptfdisk,
   gzip,
@@ -19,6 +20,7 @@
   lib,
   linkFarm,
   makeWrapper,
+  minio,
   nftables,
   OVMFFull,
   qemu_kvm,
@@ -41,12 +43,14 @@
     criu
     dnsmasq
     e2fsprogs
+    getent
     gnutar
     gptfdisk
     gzip
     iproute2
     iptables
     kmod
+    minio
     nftables
     qemu_kvm
     qemu-utils
