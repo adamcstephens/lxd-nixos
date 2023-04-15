@@ -35,15 +35,6 @@
 
       outputs = ["out" "client"];
 
-      patches = lib.optionals (lib.versionAtLeast version "5.12") [
-        # remove on 5.13 https://github.com/lxc/lxd/pull/11480
-        (fetchpatch {
-          name = "vmgenid-aarch64.patch";
-          url = "https://github.com/lxc/lxd/pull/11480.patch";
-          sha256 = "sha256-B9GnLlpJDBFZLqsfAziXs8KzpzcAvIZvuSVrCnBSlm0=";
-        })
-      ];
-
       postPatch = ''
         substituteInPlace shared/usbid/load.go \
           --replace "/usr/share/misc/usb.ids" "${hwdata}/share/hwdata/usb.ids"
@@ -100,26 +91,23 @@
         installShellCompletion --bash --name lxd ./scripts/bash/lxd-client
       '';
 
-      meta = with lib; {
+      meta = {
         description = "Daemon based on liblxc offering a REST API to manage containers";
         homepage = "https://linuxcontainers.org/lxd/";
         changelog = "https://github.com/lxc/lxd/releases/tag/lxd-${version}";
-        license = licenses.asl20;
-        maintainers = with maintainers; [marsam adamcstephens];
-        platforms = platforms.linux;
+        license = lib.licenses.asl20;
+        maintainers = with lib.maintainers; [marsam adamcstephens];
+        platforms = lib.platforms.linux;
       };
     };
-in rec {
-  lxd-unwrapped_5_0 = generic {
+in {
+  lxd-unwrapped-lts = generic {
     version = "5.0.2";
     hash = "sha256-gJ0+rIbZzDJ0GcQSH45r1f+qnkikXz3mGPZYKgzEzjo=";
   };
 
-  lxd-unwrapped_5_11 = generic {
-    version = "5.12";
-    hash = "sha256-YGH/M0aw56snNt3s8drcJYHZPYkVW993YilF228nMhw=";
+  lxd-unwrapped = generic {
+    version = "5.13";
+    hash = "sha256-kys8zfqhkpJqq4ICg6dOsoJEoxJ209GwdjGRrfrZ7j0=";
   };
-
-  lxd-unwrapped = lxd-unwrapped_5_11;
-  lxd-unwrapped-lts = lxd-unwrapped_5_0;
 }
