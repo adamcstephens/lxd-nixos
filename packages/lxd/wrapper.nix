@@ -31,6 +31,7 @@
   util-linux,
   writeShellScriptBin,
   xz,
+  zfs,
   nixosTests,
 }: let
   lxd = lxd-unwrapped;
@@ -58,6 +59,7 @@
     squashfsTools
     util-linux
     xz
+    zfs
 
     (writeShellScriptBin "apparmor_parser" ''
       exec '${apparmor-parser}/bin/apparmor_parser' -I '${apparmor-profiles}/etc/apparmor.d' "$@"
@@ -88,7 +90,7 @@ in
 
     nativeBuildInputs = [makeWrapper];
     postBuild = ''
-      wrapProgram $out/bin/lxd --prefix PATH : ${lib.makeBinPath binPath}:${qemu_kvm}/libexec:$out/bin --set LXD_OVMF_PATH ${LXD_OVMF_PATH}
+      wrapProgram $out/bin/lxd --prefix PATH : ${lib.makeBinPath binPath}:${qemu_kvm}/libexec:${zfs}/lib/udev:$out/bin --set LXD_OVMF_PATH ${LXD_OVMF_PATH}
     '';
 
     passthru.tests = {
