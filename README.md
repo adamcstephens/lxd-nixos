@@ -9,18 +9,6 @@ Features:
 - Container and VM image building
 - Importing and customizing images
 
-## Importing Images
-
-Use these commands to build images for both containers and VMs and then import them into LXD
-
-```
-$ nix run git+https://codeberg.org/adamcstephens/lxd-nixos#import/nixos/2211/container
-$ nix run git+https://codeberg.org/adamcstephens/lxd-nixos#import/nixos/unstable/container
-
-# now available for running
-$ lxc launch nixos/22.11/container test1
-```
-
 ## Flake setup
 
 Add to your flake
@@ -60,13 +48,64 @@ Use one of the following to configure a nixosConfiguration as an LXD guest.
   ];
 ```
 
-## Import your own images
+## Import Images
 
-This requires flake-parts.
+There are multiple supported ways to import and customize images.
 
-1. Add the nixosModule for the container or vm to a nixosConfiguration
+### Base Images
 
-2. Update your flake to include the importers in your packages and define an image. Here's a full example, but you may want to look at the options in [the flake module](./parts/images.nix) and the [images built by this repo](./images.nix).
+This flake provides a set of base NixOS images that can be imported without any configuration.
+
+Use these commands to build images for both containers and VMs and then import them into LXD
+
+```
+$ nix run git+https://codeberg.org/adamcstephens/lxd-nixos#import/nixos/2211/container
+$ nix run git+https://codeberg.org/adamcstephens/lxd-nixos#import/nixos/unstable/container
+
+# now available for running
+$ lxc launch nixos/22.11/container test1
+```
+
+
+### Customized Base Images
+
+These customized base images use the same names as the default base images, but allow for overriding the configuration. By using `lxd.imageDefaults.extraConfig`, nixos configuration can be applied to all the base images.
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    lxd-nixos.url = "git+https://codeberg.org/adamcstephens/lxd-nixos";
+  };
+
+  outputs = inputs @ {flake-parts, ...}:
+    flake-parts.lib.mkFlake {inherit inputs;} {
+      imports = [
+        inputs.lxd-nixos.flakeModules.images
+        inputs.lxd-nixos.flakeModules.baseImages
+      ];
+
+      systems = ["x86_64-linux" "aarch64-linux"];
+
+      lxd.imageDefaults.extraConfig = {
+        _module.args = {
+          inherit inputs;
+          hostname = "bootstrap";
+        };
+
+        imports = [
+          ../core
+          inputs.home-manager.nixosModules.home-manager
+          inputs.ragenix.nixosModules.age
+        ];
+      };
+    };
+}
+```
+
+### Standalone Images
+
+Images can be built, checked and imported by creating custom `lxd.images`.
 
 ```nix
 {
@@ -101,22 +140,38 @@ This requires flake-parts.
 }
 ```
 
-3. Run `nix flake show` to see newly added packages for `import/nixos/container` and run the importer
+### Generate Images from nixosConfigurations
 
-``` sh
-$ nix run .#import/nixos/container
-```
+Use `lxd.generateImporters` to automatically create import apps for all nixosConfigurations.
 
-4. Use your new image!
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    lxd-nixos.url = "git+https://codeberg.org/adamcstephens/lxd-nixos";
+  };
 
-``` sh
-$ lxc launch nixos/mycontainer u1
-Creating u1
-Starting u1
+  outputs = inputs @ {flake-parts, ...}:
+    flake-parts.lib.mkFlake {inherit inputs;} {
+      imports = [
+        inputs.lxd-nixos.flakeModules.images
+      ];
 
-$ lxc exec u1 bash
+      systems = ["x86_64-linux" "aarch64-linux"];
 
-[root@nixos:~]#
+      lxd.generateImporters = true;
+
+      nixosConfigurations = {
+        test = inputs.nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+
+          modules = [
+            inputs.lxd-nixos.nixosModules.virtual-machine
+          ];
+        };
+      };
+    };
+}
 ```
 
 ## Background

@@ -14,6 +14,11 @@
   apps = lib.zipAttrs (builtins.attrValues (lib.mapAttrs (_: i: i.app) images));
   checks = lib.zipAttrs (builtins.attrValues (lib.mapAttrs (_: i: i.check) images));
 in {
+  imports = [
+    ../lib/import.nix
+    ./image-generator.nix
+  ];
+
   options = {
     lxd.images = lib.mkOption {
       default = {};
@@ -50,7 +55,6 @@ in {
             default = {};
             description = lib.mdDoc ''
               LXD metadata to pass through to image
-
             '';
           };
 
@@ -91,12 +95,6 @@ in {
             readOnly = true;
           };
 
-          imageFile = lib.mkOption {
-            type = lib.types.unspecified;
-            description = lib.mdDoc "Path to the file to be imported, e.g. squashfs or qcow2";
-            readOnly = true;
-          };
-
           importScript = lib.mkOption {
             type = lib.types.package;
             description = lib.mdDoc "Script to import an image";
@@ -111,26 +109,9 @@ in {
         };
 
         config = let
-          normalizedRelease = builtins.replaceStrings ["."] [""] config.release;
           safeName = "nixos/" + (builtins.replaceStrings ["."] [""] config.imageName);
           appSafeName = "import/${safeName}";
         in {
-          imageFile =
-            if (config.type == "virtual-machine")
-            then config.nixosConfiguration.config.system.build.qemuImage + "/nixos.qcow2"
-            else config.nixosConfiguration.config.system.build.squashfs;
-
-          importScript = withSystem config.system ({pkgs, ...}:
-            pkgs.writeScript "import-${config.type}-${normalizedRelease}" ''
-              [ -n "$1" ] && REMOTE="$1:"
-
-               echo ":: Running importer ${config.imageAlias}"
-               lxc image import --alias ${config.imageAlias} \
-                 ${config.nixosConfiguration.config.system.build.metadata}/tarball/nixos-lxd-metadata-${config.system}.tar.xz \
-                 ${config.imageFile} \
-                 $REMOTE
-            '');
-
           nixosConfiguration = config.nixpkgs.lib.nixosSystem {
             inherit (config) system;
 
@@ -148,7 +129,7 @@ in {
 
           app.${config.system}.${appSafeName} = {
             type = "app";
-            program = builtins.toString config.importScript;
+            program = builtins.toString (self.lib.importScript config);
           };
 
           check.${config.system}.${safeName} = withSystem config.system (
