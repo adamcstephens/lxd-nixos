@@ -107,7 +107,7 @@ in {
   };
 
   lxd-unwrapped = generic {
-    version = "5.13";
-    hash = "sha256-kys8zfqhkpJqq4ICg6dOsoJEoxJ209GwdjGRrfrZ7j0=";
+    version = "5.14";
+    hash = "sha256-EtVZ0g9LD6dWA70/E1Ad/RWJjbvrAzU2hF3n6CdTMBE=";
   };
 }
