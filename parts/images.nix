@@ -112,6 +112,10 @@ in {
           safeName = "nixos/" + (builtins.replaceStrings ["."] [""] config.imageName);
           appSafeName = "import/${safeName}";
         in {
+          importScript = self.lib.importScript {
+            inherit (config) imageAlias nixosConfiguration release system type;
+          };
+
           nixosConfiguration = config.nixpkgs.lib.nixosSystem {
             inherit (config) system;
 
