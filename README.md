@@ -59,11 +59,11 @@ This flake provides a set of base NixOS images that can be imported without any 
 Use these commands to build images for both containers and VMs and then import them into LXD
 
 ```
-$ nix run git+https://codeberg.org/adamcstephens/lxd-nixos#import/nixos/2211/container
+$ nix run git+https://codeberg.org/adamcstephens/lxd-nixos#import/nixos/2305/container
 $ nix run git+https://codeberg.org/adamcstephens/lxd-nixos#import/nixos/unstable/container
 
 # now available for running
-$ lxc launch nixos/22.11/container test1
+$ lxc launch nixos/23.05/container test1
 ```
 
 

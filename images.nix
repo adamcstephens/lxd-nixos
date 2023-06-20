@@ -5,10 +5,10 @@
 }: {
   config.lxd.images = {
     #
-    # 22.11
+    # 23.05
     #
-    container-2211-x86_64 = {
-      release = "22.11";
+    container-2305-x86_64 = {
+      release = "23.05";
       nixpkgs = inputs.nixpkgs;
 
       system = "x86_64-linux";
@@ -17,8 +17,8 @@
       config = config.lxd.imageDefaults.config;
     };
 
-    virtual-machine-2211-x86_64 = {
-      release = "22.11";
+    virtual-machine-2305-x86_64 = {
+      release = "23.05";
       nixpkgs = inputs.nixpkgs;
 
       system = "x86_64-linux";
@@ -27,8 +27,8 @@
       config = config.lxd.imageDefaults.config;
     };
 
-    container-2211-aarch64 = {
-      release = "22.11";
+    container-2305-aarch64 = {
+      release = "23.05";
       nixpkgs = inputs.nixpkgs;
 
       system = "aarch64-linux";
@@ -37,8 +37,8 @@
       config = config.lxd.imageDefaults.config;
     };
 
-    virtual-machine-2211-aarch64 = {
-      release = "22.11";
+    virtual-machine-2305-aarch64 = {
+      release = "23.05";
       nixpkgs = inputs.nixpkgs;
 
       system = "aarch64-linux";

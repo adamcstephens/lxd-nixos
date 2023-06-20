@@ -59,8 +59,8 @@ in {
           };
 
           release = lib.mkOption {
-            type = lib.types.str;
-            description = lib.mdDoc "Release string, e.g. `22.11` or `unstable`";
+            type = lib.types.enum ["23.05" "unstable"];
+            description = lib.mdDoc "Release string, e.g. `23.05` or `unstable`";
           };
 
           config = lib.mkOption {
