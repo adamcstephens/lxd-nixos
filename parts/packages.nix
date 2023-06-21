@@ -18,18 +18,12 @@
     };
   in {
     packages = {
-      inherit
-        (pkgs.callPackage ../packages/lxd {
-          inherit (inputs'.nixpkgs-unstable.legacyPackages) dqlite raft-canonical;
-        })
-        lxd-unwrapped-lts
-        lxd-unwrapped
-        ;
-
+      inherit (pkgs.callPackage ../packages/lxd {}) lxd-unwrapped-lts lxd-unwrapped;
       ovmf = pkgs.callPackage ../packages/ovmf {};
 
       lxd = pkgs.callPackage ../packages/lxd/wrapper.nix {
         inherit (lxdOverrides) OVMFFull;
+        inherit (inputs'.nixpkgs-qemu.legacyPackages) qemu_kvm qemu-utils;
         lxd-unwrapped = self'.packages.lxd-unwrapped;
       };
 

@@ -35,6 +35,11 @@
 
       outputs = ["out" "client"];
 
+      # remove on 5.15: https://github.com/lxc/lxd/pull/11792
+      patches = lib.optionals ((builtins.compareVersions version "5.14") == 0) [
+        ./vhost-net.patch
+      ];
+
       postPatch = ''
         substituteInPlace shared/usbid/load.go \
           --replace "/usr/share/misc/usb.ids" "${hwdata}/share/hwdata/usb.ids"
