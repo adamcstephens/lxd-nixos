@@ -5,7 +5,6 @@ NixOS support for LXD. Flake (parts) native.
 Features:
 
 - NixOS modules for Containers and VMs
-- Packages for LTS and Latest releases
 - Container and VM image building
 - Importing and customizing images
 
@@ -25,8 +24,6 @@ The following packages are provided
 
 * `lxd` - Latest release of LXD
 * `lxd.client` - Latest client
-* `lxd-lts` - LTS release of LXD, currently 5.0.x
-* `lxd-lts.client` - LTS client only
 
 ## NixOS Modules
 
