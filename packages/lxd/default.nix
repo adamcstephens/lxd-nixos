@@ -35,11 +35,6 @@
 
       outputs = ["out" "client"];
 
-      # remove on 5.15: https://github.com/lxc/lxd/pull/11792
-      patches = lib.optionals ((builtins.compareVersions version "5.14") == 0) [
-        ./vhost-net.patch
-      ];
-
       postPatch = ''
         substituteInPlace shared/usbid/load.go \
           --replace "/usr/share/misc/usb.ids" "${hwdata}/share/hwdata/usb.ids"
@@ -112,7 +107,7 @@ in {
   };
 
   lxd-unwrapped = generic {
-    version = "5.14";
-    hash = "sha256-EtVZ0g9LD6dWA70/E1Ad/RWJjbvrAzU2hF3n6CdTMBE=";
+    version = "5.15";
+    hash = "sha256-ez/875yu0XYu5ORf4ak6RN1jWGxuGk0n9023zJkoluM=";
   };
 }
