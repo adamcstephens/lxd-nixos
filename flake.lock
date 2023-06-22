@@ -68,22 +68,6 @@
         "type": "github"
       }
     },
-    "nixpkgs-qemu": {
-      "locked": {
-        "lastModified": 1681050994,
-        "narHash": "sha256-946c1VnxOQIndPtnPziXp7O6e6d5YeofgtoEyHvp5vU=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "3c384353a64ee069240af601aa6781bb556351cf",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "3c384353a64ee069240af601aa6781bb556351cf",
-        "type": "github"
-      }
-    },
     "nixpkgs-unstable": {
       "locked": {
         "lastModified": 1686960236,
@@ -105,7 +89,6 @@
         "flake-parts": "flake-parts",
         "nixpkgs": "nixpkgs",
         "nixpkgs-2305": "nixpkgs-2305",
-        "nixpkgs-qemu": "nixpkgs-qemu",
         "nixpkgs-unstable": "nixpkgs-unstable"
       }
     }

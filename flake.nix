@@ -5,7 +5,6 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
     nixpkgs-2305.url = "github:nixos/nixpkgs/nixos-23.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
-    nixpkgs-qemu.url = "github:nixos/nixpkgs/3c384353a64ee069240af601aa6781bb556351cf";
   };
   outputs = {
     self,

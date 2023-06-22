@@ -23,7 +23,6 @@
 
       lxd = pkgs.callPackage ../packages/lxd/wrapper.nix {
         inherit (lxdOverrides) OVMFFull;
-        inherit (inputs'.nixpkgs-qemu.legacyPackages) qemu_kvm qemu-utils;
         lxd-unwrapped = self'.packages.lxd-unwrapped;
       };
 
