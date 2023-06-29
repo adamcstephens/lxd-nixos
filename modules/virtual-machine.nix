@@ -42,6 +42,9 @@ in {
     boot.growPartition = true;
     boot.loader.systemd-boot.enable = true;
 
+    # image building needs to know what device to install bootloader on
+    boot.loader.grub.device = "/dev/vda";
+
     boot.kernelParams = ["console=tty1" "console=${serialDevice}"];
 
     systemd.services."serial-getty@${serialDevice}" = {
