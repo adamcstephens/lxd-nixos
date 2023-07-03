@@ -1,9 +1,13 @@
 {stdenv, ...}:
 stdenv.mkDerivation {
   pname = "ovmf";
-  version = "0.1.1-lxd5.12";
+  version = "0.2.0-lxd5.15";
   src = ./.;
+
+  dontPatch = true;
   dontBuild = true;
+  dontConfigure = true;
+  dontFixup = true;
 
   outputs = ["out" "fd"];
 
