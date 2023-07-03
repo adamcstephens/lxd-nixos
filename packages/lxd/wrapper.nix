@@ -18,7 +18,6 @@
   kmod,
   lxd-unwrapped,
   lib,
-  linkFarm,
   makeWrapper,
   minio,
   nftables,
@@ -26,6 +25,7 @@
   qemu_kvm,
   qemu-utils,
   rsync,
+  spice-gtk,
   squashfsTools,
   symlinkJoin,
   util-linux,
@@ -65,15 +65,23 @@
       exec '${apparmor-parser}/bin/apparmor_parser' -I '${apparmor-profiles}/etc/apparmor.d' "$@"
     '')
   ];
+
+  clientBinPath = [
+    spice-gtk
+  ];
 in
   symlinkJoin {
     name = "lxd-${lxd.version}";
 
     paths = [lxd lxd.client];
+    outputs = ["out" "client"];
 
     nativeBuildInputs = [makeWrapper];
     postBuild = ''
       wrapProgram $out/bin/lxd --prefix PATH : ${lib.makeBinPath binPath}:${qemu_kvm}/libexec:${zfs}/lib/udev:$out/bin --set LXD_OVMF_PATH ${OVMFFull.fd}/FV
+      wrapProgram $out/bin/lxc --prefix PATH : ${lib.makeBinPath clientBinPath}
+
+      makeWrapper ${lxd.client}/bin/lxc $client/bin/lxc --prefix PATH : ${lib.makeBinPath clientBinPath}
     '';
 
     passthru.tests = {
