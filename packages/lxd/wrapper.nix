@@ -73,20 +73,17 @@ in
   symlinkJoin {
     name = "lxd-${lxd.version}";
 
-    paths = [lxd lxd.client];
-    outputs = ["out" "client"];
+    paths = [lxd];
 
     nativeBuildInputs = [makeWrapper];
     postBuild = ''
       wrapProgram $out/bin/lxd --prefix PATH : ${lib.makeBinPath binPath}:${qemu_kvm}/libexec:${zfs}/lib/udev:$out/bin --set LXD_OVMF_PATH ${OVMFFull.fd}/FV
       wrapProgram $out/bin/lxc --prefix PATH : ${lib.makeBinPath clientBinPath}
-
-      makeWrapper ${lxd.client}/bin/lxc $client/bin/lxc --prefix PATH : ${lib.makeBinPath clientBinPath}
     '';
 
     passthru.tests = {
       inherit (nixosTests) lxd lxd-nftables lxd-qemu;
     };
 
-    inherit (lxd) meta client;
+    inherit (lxd) meta;
   }

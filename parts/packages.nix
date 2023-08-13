@@ -11,7 +11,7 @@
 
       lxd = pkgs.callPackage ../packages/lxd/wrapper.nix {
         OVMFFull = ovmf;
-        lxd-unwrapped = self'.packages.lxd-unwrapped;
+        lxd-unwrapped = pkgs.lxd-unwrapped;
       };
 
       ovmf = pkgs.callPackage ../packages/ovmf {};
