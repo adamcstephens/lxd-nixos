@@ -161,14 +161,6 @@ in {
         description = lib.mdDoc "NixOS configuration that is inherited in all images";
         default = {
           networking.hostName = "";
-          lxd.image.templates = {
-            "hostname" = {
-              enable = true;
-              target = "/etc/hostname";
-              template = builtins.toFile "hostname.tpl" "{{ instance.name }}";
-              when = ["start"];
-            };
-          };
         };
       };
       extraConfig = lib.mkOption {
