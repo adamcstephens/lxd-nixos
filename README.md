@@ -4,7 +4,6 @@ NixOS support for LXD. Flake (parts) native.
 
 Features:
 
-- NixOS modules for Containers and VMs
 - Container and VM image building
 - Importing and customizing images
 
@@ -14,35 +13,6 @@ Add to your flake
 
 ```
 inputs.lxd-nixos.url = "git+https://codeberg.org/adamcstephens/lxd-nixos";
-```
-
-## Packages
-
-Nixpkgs provides an LXD package, but it is missing multiple features. While efforts continue to improve that package, this flake will strive to provide a fully functional installation.
-
-The following packages are provided
-
-* `lxd` - Latest release of LXD
-* `lxd.client` - Latest client
-
-## NixOS Modules
-
-Use one of the following to configure a nixosConfiguration as an LXD guest.
-
-### Container Guest
-
-```
-  imports = [
-    inputs.lxd-nixos.nixosModules.container
-  ];
-```
-
-### VM Guest
-
-```
-  imports = [
-    inputs.lxd-nixos.nixosModules.virtual-machine
-  ];
 ```
 
 ## Import Images
@@ -62,7 +32,6 @@ $ nix run git+https://codeberg.org/adamcstephens/lxd-nixos#import/nixos/unstable
 # now available for running
 $ lxc launch nixos/23.05/container test1
 ```
-
 
 ### Customized Base Images
 
