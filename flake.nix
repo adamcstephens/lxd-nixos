@@ -21,12 +21,6 @@
         ./parts/images.nix
       ];
 
-      flake.nixosModules.agent = import ./modules/agent.nix;
-      flake.nixosModules.container = import ./modules/container.nix;
-      flake.nixosModules.imageMetadata = import ./modules/image-metadata.nix;
-      flake.nixosModules.server = import ./modules/server.nix;
-      flake.nixosModules.virtual-machine = import ./modules/virtual-machine.nix;
-
       flake.flakeModules.images = ./parts/images.nix;
       flake.flakeModules.baseImages = ./images.nix;
     };
