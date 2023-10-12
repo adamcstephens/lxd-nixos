@@ -19,7 +19,6 @@
 
         ./parts/devshell.nix
         ./parts/images.nix
-        ./parts/packages.nix
       ];
 
       flake.nixosModules.agent = import ./modules/agent.nix;
